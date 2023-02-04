@@ -37,8 +37,7 @@ refresh<-function(arg){
   }
 
 pullStats <- function(){
-  mutate(ds, theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
-  mutate(thetime=strptime(substr(ds$EntryPublished,nchar(ds$EntryPublished)-6,nchar(ds$EntryPublished)),format="%H:%M")) %>%
+  ds %>% mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
     mutate(the_day=as.Date(mdy(theday))) -> ds
   substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> ds$pullURL
   min_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% quantile(c(.98)))
@@ -47,7 +46,7 @@ pullStats <- function(){
   day(head(sort(ds$the_day))[1]) -> start_day
   gsub(pattern="/",replace="",ds$pullURL)->ds$pullURL
   paste(paste(top_outlets$pullURL,sep = " | ",collapse="|"))->k
-  cat("\nlast 5 entries: \n\n");print(tail(ds %>% arrange(EntryPublished),n=5))
+    cat("\nlast 5 entries: \n\n");print(tail(ds %>% arrange(EntryPublished),n=5))
   cat(paste("\n ->",dim(ds)[1]," rows, ",dim(ds)[2]," variables | avg. = ",
             round(mean(as.data.frame(as.data.frame(table(ds$the_day))[2])$Freq),2), " per day\n",
             "-> date range: ", min(ds$theday), "-", max(ds$theday)),"\n\n")
@@ -57,8 +56,8 @@ pullStats <- function(){
     summarize(count=n()) %>% filter(count>min_arts) -> top_outlets
   assign("top_outlets",top_outlets,envir = .GlobalEnv)
   select(ds[which(grepl(k,ds$pullURL)),],region) %>% table() -> total
-  assign("ds",ds,envir = .GlobalEnv)
-  rbind(ds[which(grepl(k,ds$pullURL)),] %>% select(pullURL,region) %>% table(),total)
+  return(rbind(ds[which(grepl(k,ds$pullURL)),] %>% select(pullURL,region) %>% table(),total))
+  assign("ds",ds,envir = .GlobalEnv) 
   }
 
 refresh("all")
