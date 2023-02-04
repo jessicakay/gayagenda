@@ -45,15 +45,15 @@ pullStats <- function(){
   month(head(sort(ds$the_day))[1]) -> start_month
   day(head(sort(ds$the_day))[1]) -> start_day
   gsub(pattern="/",replace="",ds$pullURL)->ds$pullURL
+  select(ds, region, the_day, pullURL) %>% 
+    filter(!is.na(pullURL) & pullURL != "www.youtube.com/") %>%
+    group_by(pullURL,.drop=FALSE) %>%
+    summarize(count=n()) %>% filter(count>min_arts) -> top_outlets
   paste(paste(top_outlets$pullURL,sep = " | ",collapse="|"))->k
     cat("\nlast 5 entries: \n\n");print(tail(ds %>% arrange(EntryPublished),n=5))
   cat(paste("\n ->",dim(ds)[1]," rows, ",dim(ds)[2]," variables | avg. = ",
             round(mean(as.data.frame(as.data.frame(table(ds$the_day))[2])$Freq),2), " per day\n",
             "-> date range: ", min(ds$theday), "-", max(ds$theday)),"\n\n")
-  select(ds, region, the_day, pullURL) %>% 
-    filter(!is.na(pullURL) & pullURL != "www.youtube.com/") %>%
-    group_by(pullURL,.drop=FALSE) %>%
-    summarize(count=n()) %>% filter(count>min_arts) -> top_outlets
   assign("top_outlets",top_outlets,envir = .GlobalEnv)
   select(ds[which(grepl(k,ds$pullURL)),],region) %>% table() -> total
   return(rbind(ds[which(grepl(k,ds$pullURL)),] %>% select(pullURL,region) %>% table(),total))
