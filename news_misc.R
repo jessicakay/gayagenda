@@ -50,6 +50,12 @@ states <- c("Alabama",
             "Wisconsin",
             "Wyoming")
 
+paste(paste(states,sep = " | ",collapse="|"))->state_string
+
+ds[which(grepl(paste(paste(states,sep = " | ",collapse="|")),paste(ds$EntryContent,ds$EntryTitle))),] %>%
+  mutate(in_state = )
+
+
 # experimental NLP section, keywords used to further tag items
 
 ds$tag_sports <- ifelse(grepl("(?i)sport|(?i)athletic|(?i)athlete|(?i)competition", ds$EntryContent),1,0)
