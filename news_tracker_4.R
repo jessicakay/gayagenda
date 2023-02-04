@@ -30,7 +30,7 @@ refresh<-function(arg){
    if(i==1){googlesheets4::read_sheet(data_sheets$id[i]) ->> dat
     }else{rbind(dat, googlesheets4::read_sheet(data_sheets$id[i])) -> dat }
    dat -> ds ; dat ->> ds ; assign("ds",ds,envir = .GlobalEnv)}
-  ds %>% group_by(EntryTitle) %>% as_tibble(as.data.frame()) -> ds
+  ds %>% group_by(EntryTitle) %>% as_tibble(as.data.frame()) ->> ds
   pullStats()}
   if(arg=="statsOnly"){pullStats()}
   assign("ds",ds,envir = .GlobalEnv)
@@ -135,8 +135,8 @@ gridExtra::grid.arrange(a_plot,b_plot,ncol=2)
 
 
 ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
-  geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1)+
-  geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct))+
+  geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
+  geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
   labs(title = "Articles about trans people in US + UK news media",
        subtitle = "https://tech.lgbt/@jessdkant",
        caption=paste("updated",Sys.time()))+
