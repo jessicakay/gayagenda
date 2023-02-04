@@ -101,6 +101,8 @@ ds %>%
   scale_fill_discrete(name="keyword")+
   labs(y="proportion of articles",x=element_blank()) -> bottom
 
+
+
 # URL + top 2% outlets plots
 
   top_outlets %>% ggplot()+
@@ -130,3 +132,20 @@ gridExtra::grid.arrange(kw,bottom,urlPlot,heights=c(2,2,1.25))
 grid.arrange(bottom,urlPlot,heights=c(2.5,0.75)) -> a_plot
 grid.arrange(kw,top_plot,heights=c(2,1.5)) -> b_plot
 gridExtra::grid.arrange(a_plot,b_plot,ncol=2)
+
+
+ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
+  geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1)+
+  geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct))+
+  labs(title = "Articles about trans people in US + UK news media",
+       subtitle = "https://tech.lgbt/@jessdkant",
+       caption=paste("updated",Sys.time()))+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_bw()+
+  scale_size_continuous(guide = "none")+
+  theme(legend.position = "bottom")+
+  theme(panel.grid.minor = element_line(linetype = "dashed"),
+        panel.grid.major = element_line(linetype = "dashed"))+
+  facet_grid(keyword~region) 
+
