@@ -1,26 +1,22 @@
 
-# jkant@bu.edu
+# jkant@bu.edu | github.com/jessicakay/gayagenda
 
  install.packages("googlesheets4")
   
-  { 
-  library(ggplot2)
-  library(dplyr)
-  library(stringr)
-  library(lubridate)
-  library(gridExtra)
-  library(googlesheets4) 
-  } 
+  { library(ggplot2)
+    library(dplyr)
+    library(stringr)
+    library(lubridate)
+    library(gridExtra)
+    library(googlesheets4) } 
  
 # clean OAuth tokens and authenticate
 #
-#   detach(package:googlesheets4)
-#   googlesheets4::gs4_auth()
+#   detach(package:googlesheets4) ; googlesheets4::gs4_auth()
 #   headers <- c("EntryPublished","EntryTitle","EntryURL","EntryContent","FeedTitle","FeedURL","keyword","region")
 #   headers   <- as.data.frame(cbind(headers))
 #   googlesheets4::sheet_append(tsheetall,as.vector(headers),sheet =1) # inserts headers into blank sheet, only run first time
 #
-# set global variables
 
 refresh<-function(arg){
   if(arg=="pull" | arg=="all"){
@@ -75,7 +71,7 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   xlab(element_blank())+
   ylab("number of articles")+
   theme_bw()+
-  theme(legend.position = "bottom")+
+  theme(legend.position = "none")+
   facet_grid(keyword~region) -> kw
 
 ds %>% 
