@@ -1,5 +1,6 @@
 
-# jkant@bu.edu | github.com/jessicakay/gayagenda
+# contact jkant@bu.edu for use 
+# github.com/jessicakay/gayagenda
 
  install.packages("googlesheets4")
   
