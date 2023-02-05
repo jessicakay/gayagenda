@@ -18,8 +18,8 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
 ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.05)+
   geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct))+
-  labs(title = "Articles about trans people in US + UK news media",
-       subtitle = "https://tech.lgbt/@jessdkant | github.com/jessicakay/gayagenda",
+  labs(title = " ",
+       subtitle = "",
        caption=paste("updated",Sys.time()))+
   xlab(element_blank())+
   ylab("number of articles")+
@@ -34,7 +34,7 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
 ds %>% group_by(the_day,region) %>% mutate(ct=n()) %>% ggplot()+
   geom_line(aes(x=the_day,y=ct,color=region, colour="daily"))+
   labs(title = "Articles about trans people in US + UK news media",
-       subtitle = "https://tech.lgbt/@jessdkant",
+       subtitle = "github.com/jessicakay/gayagenda",
        caption=paste("updated",Sys.time()))+
   xlab(element_blank())+
   ylab("number of articles")+
