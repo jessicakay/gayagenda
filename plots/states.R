@@ -125,8 +125,9 @@ states_data %>%
 states_data %>% group_by(in_state) %>%mutate(ct=n()) %>%
   ggplot()+
   geom_bar(aes(x=ct,fill=in_state))+
-  theme_light()+
-  theme(legend.position = "right")+
+  theme_bw()+
+  theme(legend.position = "bottom")+
+  scale_color_discrete(name="")+
   labs(y="number of articles mentioning a state",x=element_blank()) -> state2
 
 {
@@ -139,7 +140,7 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   ylab("number of articles")+
   theme_bw()+
   scale_size_continuous(guide = "none")+
-  theme(legend.position = "none")+
+  theme(legend.position = "bottom")+
   theme(panel.grid.minor = element_line(linetype = "dashed"),
         panel.grid.major = element_line(linetype = "dashed"))+
   facet_grid(keyword~region) -> a
@@ -167,11 +168,14 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   xlab(element_blank())+
   ylab("number of articles")+
   theme_bw()+
-  theme(legend.position = "bottom")+
+  theme(legend.position = "none")+
   facet_grid(keyword~region) -> kw
 }
 
 grid.arrange(
   grid.arrange(a,b,kw,ncol=3),
-  grid.arrange(state2,state1,ncol=2,widths=c(1,1))
+  grid.arrange(state1,state2,ncol=2,widths=c(1.5,1))
 )
+
+
+
