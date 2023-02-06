@@ -76,7 +76,7 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   facet_grid(keyword~region) -> kw
 
 ds %>% 
-  mutate(textcontent = paste(EntryContent,EntryTitle)) %>%
+  mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
   mutate(topic=case_when(
     str_detect(textcontent,"(?i)sport|(?i)athlet|(?i)competiti|(?i)swim|(?i)hockey|(?i)rugby") == TRUE ~ "sports",
     str_detect(textcontent,"(?i)restroom|(?i)bathroom|(?i)locker|(?i)naked|(?i)ymca")== TRUE ~ "bathrooms",
