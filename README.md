@@ -8,6 +8,6 @@ My hope is that while I continue my own day-to-day advocacy work and research, I
 
 Hope you like it.
 
-Jess
+_Jess_
 
-Follow its progress on Mastodon: tech.lgbt/@jessdkant 
+### Follow its progress on Mastodon: tech.lgbt/@jessdkant 
