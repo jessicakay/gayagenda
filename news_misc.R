@@ -44,4 +44,5 @@ tidyRSS::tidyfeed(feed = "https://www.google.com/alerts/feeds/027173712757063208
 
 ds$EntryPublished
 
-
+paste("(?i)",paste(states,sep = " | ",collapse="|(?i)"),sep="")->state_list
+ds[which(grepl(state_list,ds$textcontent)),]
