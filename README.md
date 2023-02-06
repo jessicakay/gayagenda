@@ -10,4 +10,6 @@ Hope you like it.
 
 _Jess_
 
-### Follow its progress on Mastodon: tech.lgbt/@jessdkant 
+### Follow its progress on Mastodon: 
+_[tech.lgbt/@jessdkant](https://tech.lgbt/@jessdkant)_
+
