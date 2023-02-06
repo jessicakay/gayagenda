@@ -120,13 +120,13 @@ states_data %>%
   labs(title = "Articles mentioning a US state",
        subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
                         as.numeric(table(ds$region)[3][1])," articles.(N=",dim(ds)[1],")"),
-       caption=paste("updated",Sys.time()))+
+       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu"))+
   xlab(element_blank())+
   ylab("number of articles")+
-  theme_light()+
+  theme_dark()+
   theme(legend.position = "none", 
         panel.grid = element_blank())+
-  facet_wrap(in_state~.) -> state1
+  facet_wrap(in_state~.) #-> state1
 
   states_data %>% group_by(in_state) %>%mutate(ct=n()) %>%
   filter(!is.na(in_state)) %>%
@@ -192,3 +192,26 @@ grid.arrange(state1,state2,ncol=2,widths=c(1.5,1))
 paste("(?i)",paste(states,sep = " | ",collapse="|(?i)"),sep="")->state_list
 ds[which(grepl(state_list,ds$textcontent)),]
 
+# generate dark mode table for easy viewing 
+
+states_data %>%
+  group_by(the_day,in_state) %>%
+  filter(!is.na(in_state)) %>%
+  mutate(ct=n()) %>%
+  ggplot()+
+  geom_line(aes(x=the_day,y=ct,color="orange", colour="daily"))+
+  geom_point(aes(x=the_day,y=ct,color="orange", colour="daily"))+
+  labs(title = "Articles mentioning a US state",
+       subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
+                        as.numeric(table(ds$region)[3][1])," articles ( total dataset N=",dim(ds)[1],")"),
+       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu"))+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_dark()+
+  theme(legend.position = "none", 
+        panel.grid = element_blank(), 
+        axis.text.x = element_text(colour="white"),
+        axis.text.y = element_text(colour="white"),
+        plot.background = element_rect("black"), panel.background =element_rect("black"),
+        text=element_text(colour="white"))+
+  facet_wrap(in_state~.) #-> state1
