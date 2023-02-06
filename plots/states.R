@@ -128,23 +128,15 @@ states_data %>%
         panel.grid = element_blank())+
   facet_wrap(in_state~.) -> state1
 
-# states_data %>% group_by(in_state) %>%mutate(ct=n()) %>%
-#  filter(!is.na(in_state)) %>%
-#  ggplot()+
-#  geom_bar(aes(x=ct,fill=in_state))+
-#  theme_bw()+
-#  theme(legend.position = "bottom",
-#        legend.title=element_blank())+
-#  labs(y="number of articles mentioning a state",x=element_blank()) -> state2
-
-states_data %>% group_by(in_state) %>%mutate(ct=n()) %>%
+  states_data %>% group_by(in_state) %>%mutate(ct=n()) %>%
   filter(!is.na(in_state)) %>%
   ggplot()+
   geom_bar(aes(x=ct,fill=in_state))+
   theme_bw()+
   theme(legend.position = "bottom",
-        legend.title=element_blank())+
+       legend.title=element_blank())+
   labs(y="number of articles mentioning a state",x=element_blank()) -> state2
+
 
 {
 ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
