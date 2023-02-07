@@ -194,6 +194,9 @@ ds[which(grepl(state_list,ds$textcontent)),]
 
 # generate dark mode table for easy viewing 
 
+setwd("/GitHub/misc/gayagenda/plots/")
+png(filename = paste("state_map_",gsub("-","_",Sys.Date()),".png",sep=""), 
+    res=800, width = 18, height = 16, units = "in")
 states_data %>%
   group_by(the_day,in_state) %>%
   filter(!is.na(in_state)) %>%
@@ -201,17 +204,19 @@ states_data %>%
   ggplot()+
   geom_line(aes(x=the_day,y=ct,color="orange", colour="daily"))+
   geom_point(aes(x=the_day,y=ct,color="orange", colour="daily"))+
-  labs(title = "Articles mentioning a US state",
+  labs(title = paste("Articles mentioning a US state, ",format(min(states_data$the_day),"%m/%d")," - ",
+                     format(max(states_data$the_day),"%m/%d"),sep=""),
        subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
-                        as.numeric(table(ds$region)[3][1])," articles ( total dataset N=",dim(ds)[1],")"),
-       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu"))+
+                        as.numeric(table(ds$region)[3][1])," articles, region: USA ( total dataset N =",dim(ds)[1],")"),
+       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu\n"),sep="")+
   xlab(element_blank())+
   ylab("number of articles")+
   theme_dark()+
   theme(legend.position = "none", 
-        panel.grid = element_blank(), 
+        panel.grid = element_blank(), panel.border = element_blank(), 
         axis.text.x = element_text(colour="white"),
         axis.text.y = element_text(colour="white"),
         plot.background = element_rect("black"), panel.background =element_rect("black"),
         text=element_text(colour="white"))+
   facet_wrap(in_state~.) #-> state1
+dev.off()
