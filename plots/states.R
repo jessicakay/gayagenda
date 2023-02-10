@@ -195,12 +195,47 @@ ds[which(grepl(state_list,ds$textcontent)),]
 # generate dark mode table for easy viewing 
 
 setwd("/GitHub/misc/gayagenda/plots/")
+
+
 png(filename = paste("state_map_",gsub("-","_",Sys.Date()),".png",sep=""), 
     res=800, width = 18, height = 16, units = "in")
 states_data %>%
   group_by(the_day,in_state) %>%
   filter(!is.na(in_state)) %>%
   mutate(ct=n()) %>%
+# filter("2023-02-01" < the_day & the_day >"2023-01-01") %>%
+  ggplot()+
+  geom_line(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
+  geom_point(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
+  labs(title = paste("Articles mentioning a US state, ",format(min(states_data$the_day),"%m/%d")," - ",
+                     format(max(states_data$the_day),"%m/%d"),sep=""),
+       subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
+                        as.numeric(table(ds$region)[3][1])," articles, region: USA ( total dataset N =",dim(ds)[1],")"),
+       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu\n"),sep="",
+       colour="Google News search term: ")+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_dark()+
+  theme(legend.position = "bottom", 
+        panel.grid = element_blank(), panel.border = element_blank(), 
+        axis.text.x = element_text(colour="white"),
+        axis.text.y = element_text(colour="white"),
+        legend.background = element_rect("black"),
+        legend.box.background = element_rect("black"),
+        legend.key = element_rect("black"),
+        plot.background = element_rect("black"), panel.background =element_rect("black"),
+        text=element_text(colour="white"))+
+  scale_color_brewer(palette = "Spectral")+
+  facet_wrap(in_state~.)
+dev.off()
+
+png(filename = paste("state_map_",gsub("-","_",Sys.Date()),".png",sep=""), 
+    res=800, width = 18, height = 16, units = "in")
+states_data %>%
+  group_by(the_day,in_state) %>%
+  filter(!is.na(in_state)) %>%
+  mutate(ct=n()) %>%
+  # filter("2023-02-01" < the_day & the_day >"2023-01-01") %>%
   ggplot()+
   geom_line(aes(x=the_day,y=ct,color="orange", colour="daily"))+
   geom_point(aes(x=the_day,y=ct,color="orange", colour="daily"))+
@@ -208,7 +243,8 @@ states_data %>%
                      format(max(states_data$the_day),"%m/%d"),sep=""),
        subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
                         as.numeric(table(ds$region)[3][1])," articles, region: USA ( total dataset N =",dim(ds)[1],")"),
-       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu\n"),sep="")+
+       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu\n"),sep="",
+       colour="Google News search term: ")+
   xlab(element_blank())+
   ylab("number of articles")+
   theme_dark()+
@@ -216,7 +252,81 @@ states_data %>%
         panel.grid = element_blank(), panel.border = element_blank(), 
         axis.text.x = element_text(colour="white"),
         axis.text.y = element_text(colour="white"),
+        legend.background = element_rect("black"),
+        legend.box.background = element_rect("black"),
+        legend.key = element_rect("black"),
         plot.background = element_rect("black"), panel.background =element_rect("black"),
         text=element_text(colour="white"))+
-  facet_wrap(in_state~.) #-> state1
+  scale_color_brewer(palette = "Spectral")+
+  facet_wrap(in_state~.)
 dev.off()
+
+
+ds %>%
+  mutate(in_state = 
+           case_when(
+             str_detect(textcontent, pattern="Alabama")        == TRUE ~ "Alabama",
+             str_detect(textcontent, pattern="Arizona")        == TRUE ~ "Arizona",
+             str_detect(textcontent, pattern="Arkansas")       == TRUE ~ "Arkansas",
+             str_detect(textcontent, pattern="California")     == TRUE ~ "California",
+             str_detect(textcontent, pattern="Colorado")       == TRUE ~ "Colorado",
+             str_detect(textcontent, pattern="Connecticut")    == TRUE ~ "Connecticut",
+             str_detect(textcontent, pattern="DC")             == TRUE ~ "DC",
+             str_detect(textcontent, pattern="Delaware")       == TRUE ~ "Delaware",
+             str_detect(textcontent, pattern="Florida")        == TRUE ~ "Florida",
+             str_detect(textcontent, pattern="Georgia")        == TRUE ~ "Georgia",
+             str_detect(textcontent, pattern="Hawaii")         == TRUE ~ "Hawaii",
+             str_detect(textcontent, pattern="Idaho")          == TRUE ~ "Idaho",
+             str_detect(textcontent, pattern="Illinois")       == TRUE ~ "Illinois",
+             str_detect(textcontent, pattern="Indiana")        == TRUE ~ "Indiana",
+             str_detect(textcontent, pattern="Iowa")           == TRUE ~ "Iowa",
+             str_detect(textcontent, pattern="Kansas")         == TRUE ~ "Kansas",
+             str_detect(textcontent, pattern="Kentucky")       == TRUE ~ "Kentucky",
+             str_detect(textcontent, pattern="Lousiana")       == TRUE ~ "Lousiana",
+             str_detect(textcontent, pattern="Maine")          == TRUE ~ "Maine",
+             str_detect(textcontent, pattern="Maryland")       == TRUE ~ "Maryland",
+             str_detect(textcontent, pattern="Massachusetts")  == TRUE ~ "Massachusetts",
+             str_detect(textcontent, pattern="Michigan")       == TRUE ~ "Michigan",
+             str_detect(textcontent, pattern="Minnesota")      == TRUE ~ "Minnesota",
+             str_detect(textcontent, pattern="Mississippi")    == TRUE ~ "Mississippi",
+             str_detect(textcontent, pattern="Montana")        == TRUE ~ "Montana",
+             str_detect(textcontent, pattern="Nebraska")       == TRUE ~ "Nebraska",
+             str_detect(textcontent, pattern="Nevada")         == TRUE ~ "Nevada",
+             str_detect(textcontent, pattern="New Hampshire")  == TRUE ~ "New Hampshire",
+             str_detect(textcontent, pattern="New Jersey")     == TRUE ~ "New Jersey",
+             str_detect(textcontent, pattern="New Mexico")     == TRUE ~ "New Mexico",
+             str_detect(textcontent, pattern="New York")       == TRUE ~ "New York",
+             str_detect(textcontent, pattern="North Carolina") == TRUE ~ "North Carolina",
+             str_detect(textcontent, pattern="North Dakota")   == TRUE ~ "North Dakota",
+             str_detect(textcontent, pattern="Ohio")           == TRUE ~ "Ohio",
+             str_detect(textcontent, pattern="Oklahoma")       == TRUE ~ "Oklahoma",
+             str_detect(textcontent, pattern="Oregon")         == TRUE ~ "Oregon",
+             str_detect(textcontent, pattern="Pennsylvania")   == TRUE ~ "Pennsylvania",
+             str_detect(textcontent, pattern="Puerto Rico")    == TRUE ~ "Puerto Rico",
+             str_detect(textcontent, pattern="Rhode Island")   == TRUE ~ "Rhode Island",
+             str_detect(textcontent, pattern="South Carolina") == TRUE ~ "South Carolina",
+             str_detect(textcontent, pattern="South Dakota")   == TRUE ~ "South Dakota",
+             str_detect(textcontent, pattern="Tennessee")      == TRUE ~ "Tennessee",
+             str_detect(textcontent, pattern="Texas")          == TRUE ~ "Texas",
+             str_detect(textcontent, pattern="Utah")           == TRUE ~ "Utah",
+             str_detect(textcontent, pattern="Vermont")        == TRUE ~ "Vermont",
+             str_detect(textcontent, pattern="Virginia")       == TRUE ~ "Virginia",
+             str_detect(textcontent, pattern="Washington")     == TRUE ~ "Washington",
+             str_detect(textcontent, pattern="West Virginia")  == TRUE ~ "West Virginia",
+             str_detect(textcontent, pattern="Wisconsin")      == TRUE ~ "Wisconsin",
+             str_detect(textcontent, pattern="Wyoming")        == TRUE ~ "Wyoming"
+           )) -> sd_ds
+
+sd_ds %>% filter(in_state %in% states) %>% select(in_state) %>% table()
+
+sd_ds %>% filter(in_state %in% states) %>% 
+  select(in_state, pullURL, keyword) %>%
+  group_by(in_state, pullURL, keyword) %>%
+  summarize(num_urls = n()) %>% filter(num_urls>0) %>%
+  filter(in_state=="Texas") %>% View()
+
+sd_ds %>% filter(in_state %in% states) %>%
+select(region, the_day, pullURL, in_state) %>% 
+  filter(!is.na(pullURL) & pullURL != "www.youtube.com/") %>%
+  group_by(in_state, .drop=FALSE) %>%
+  summarize(count=n()) %>% filter(count>min_arts) %>% select(in_state, count, pullURL)
