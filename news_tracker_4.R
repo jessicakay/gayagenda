@@ -19,7 +19,7 @@
 #   googlesheets4::sheet_append(tsheetall,as.vector(headers),sheet =1) # inserts headers into blank sheet, only run first time
 #
 
-refresh<-function(arg){
+refresh<-function(arg="all"){
   if(arg=="pull" | arg=="all"){
    googledrive::drive_find(pattern = "trans news tracker",verbose = TRUE ) -> data_sheets 
    dat <<- NULL
@@ -28,15 +28,15 @@ refresh<-function(arg){
     }else{rbind(dat, googlesheets4::read_sheet(data_sheets$id[i])) -> dat }
    dat -> ds ; dat ->> ds ; assign("ds",ds,envir = .GlobalEnv)}
   ds %>% group_by(EntryTitle) %>% as_tibble(as.data.frame()) ->> ds
-  pullStats()}
+  return(pullStats())}
   if(arg=="statsOnly"){pullStats()}
   assign("ds",ds,envir = .GlobalEnv)
   }
 
 pullStats <- function(){
   ds %>% mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
-    mutate(the_day=as.Date(mdy(theday))) -> ds
-  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> ds$pullURL
+    mutate(the_day=as.Date(mdy(theday))) ->> ds
+  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) ->> ds$pullURL
   min_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% quantile(c(.98)))
   max_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% max)
   month(head(sort(ds$the_day))[1]) -> start_month
@@ -59,7 +59,7 @@ pullStats <- function(){
 
 refresh("all")
 pullStats()
-
+run_nlp()
   
 # stratify by keyword
 
@@ -75,6 +75,7 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   theme(legend.position = "none")+
   facet_grid(keyword~region) -> kw
 
+run_nlp<-function(){
 ds %>% 
   mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
   mutate(topic=case_when(
@@ -87,7 +88,7 @@ ds %>%
     str_detect(textcontent,"(?i)actor|(?i)film|(?i)movie|(?i)television|(?i)author|(?i)actress|(?i)singer") == TRUE ~ "entertainment",
     str_detect(textcontent,"(?i)legislat|(?i)bill|(?i)lawmaker|(?i)reform|(?i)senat|(?i)ban|(?i)house\\s(?i)repre") == TRUE ~ "legislation",
     str_detect(textcontent,"(?i)medical|(?i)healthcare|(?i)hormone|(?i)medication|(?i)surgery|(?i)physician") == TRUE ~ "healthcare",
-    str_detect(textcontent,"(?i)murder|(?i)rape|(?i)rapist|(?i)kidnap|(?i)killed|(?i)offender|(?i)predator|(?i)assault") == TRUE ~ "crime")) -> ds 
+    str_detect(textcontent,"(?i)murder|(?i)rape|(?i)rapist|(?i)kidnap|(?i)killed|(?i)offender|(?i)predator|(?i)assault") == TRUE ~ "crime")) ->> ds}
 
 ds %>%
   ggplot()+
