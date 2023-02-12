@@ -98,3 +98,8 @@ grid.arrange(a,b,c,d,ncol=2)
 png(filename = "topic_plot.png", res=800, width = 24, height = 12, units = "in")
 grid.arrange(a,b,ncol=2)
 dev.off()
+
+e+theme_dark()+
+  theme(plot.background=element_rect("black"),panel.grid = element_line("black"),  
+        panel.background = element_rect("black"))+
+  scale_color_continuous()
