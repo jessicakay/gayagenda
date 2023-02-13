@@ -101,5 +101,7 @@ dev.off()
 
 e+theme_dark()+
   theme(plot.background=element_rect("black"),panel.grid = element_line("black"),  
-        panel.background = element_rect("black"))+
-  scale_color_continuous()
+        panel.background = element_rect("black"),
+        legend.background = element_rect("black"),
+        legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+        text = element_text(colour = "white"))
