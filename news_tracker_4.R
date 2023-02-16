@@ -28,7 +28,8 @@ refresh<-function(arg="all"){
     }else{rbind(dat, googlesheets4::read_sheet(data_sheets$id[i])) -> dat }
    dat -> ds ; dat ->> ds ; assign("ds",ds,envir = .GlobalEnv)}
   ds %>% group_by(EntryTitle) %>% as_tibble(as.data.frame()) ->> ds
-  return(pullStats())}
+  return(pullStats())
+  run_nlp()}
   if(arg=="statsOnly"){pullStats()}
   assign("ds",ds,envir = .GlobalEnv)
   }
@@ -36,7 +37,7 @@ refresh<-function(arg="all"){
 pullStats <- function(){
   ds %>% mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
     mutate(the_day=as.Date(mdy(theday))) ->> ds
-  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) ->> ds$pullURL
+  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> ds$pullURL
   min_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% quantile(c(.98)))
   max_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% max)
   month(head(sort(ds$the_day))[1]) -> start_month
@@ -59,7 +60,6 @@ pullStats <- function(){
 
 refresh("all")
 pullStats()
-run_nlp()
   
 # stratify by keyword
 
@@ -114,10 +114,11 @@ ds %>%
                      start_month,"/",start_day,": \n", sep="")) -> urlPlot
   
   ds[which(grepl(k,ds$pullURL)),] %>% select(pullURL,region,keyword) %>% 
+    mutate(urlSmall=gsub(pattern="www.","",pullURL)) %>%
     ggplot()+
     theme_bw()+
     scale_fill_discrete(element_blank())+
-    geom_bar(aes(x=pullURL,fill=pullURL),position = "dodge")+
+    geom_bar(aes(x=pullURL,fill=urlSmall),position = "dodge")+
     theme(legend.position = "none",
           axis.text.x = element_blank(),
           axis.ticks.x = element_blank())+
@@ -142,8 +143,32 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   ylab("number of articles")+
   theme_bw()+
   scale_size_continuous(guide = "none")+
+  scale_alpha_continuous(guide="none")+
   theme(legend.position = "bottom")+
   theme(panel.grid.minor = element_line(linetype = "dashed"),
         panel.grid.major = element_line(linetype = "dashed"))+
-  facet_grid(keyword~region) 
+  facet_grid(keyword~region)
+
+
+
+ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
+  filter(region!="all regions") %>%
+  ggplot()+
+  geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
+  geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
+  labs(title = "Articles about trans people in US + UK news media",
+       subtitle = "https://tech.lgbt/@jessdkant",
+       caption=paste("updated",Sys.time()))+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_dark()+
+  scale_size_continuous(guide = "none")+
+  scale_alpha_continuous(guide="none")+
+  scale_color_brewer(palette = "Spectral")+
+  theme(text=element_text(colour="white"),
+    legend.position = "bottom",legend.background = element_rect("black"),
+        panel.grid.minor = element_line(linetype = "dotted"),
+        panel.grid.major = element_line(linetype = "dotted"),
+        panel.background = element_rect("black"), legend.box.background = element_rect("black"), plot.background = element_rect("black"))+
+  facet_grid(keyword~region)
 

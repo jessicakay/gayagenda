@@ -46,3 +46,14 @@ ds$EntryPublished
 
 paste("(?i)",paste(states,sep = " | ",collapse="|(?i)"),sep="")->state_list
 ds[which(grepl(state_list,ds$textcontent)),]
+
+
+
+
+kw+theme_dark()+
+  theme(plot.background = element_rect("black"),
+        panel.background = element_rect("black"),
+        legend.background = element_rect("black"),
+        legend.key = element_rect("black"),
+        text = element_text(colour = "white"),
+        panel.grid = element_blank())
