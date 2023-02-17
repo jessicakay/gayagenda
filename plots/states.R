@@ -192,76 +192,6 @@ grid.arrange(state1,state2,ncol=2,widths=c(1.5,1))
 paste("(?i)",paste(states,sep = " | ",collapse="|(?i)"),sep="")->state_list
 ds[which(grepl(state_list,ds$textcontent)),]
 
-# generate dark mode table for easy viewing 
-
-setwd("/GitHub/misc/gayagenda/plots/")
-
-
-png(filename = paste("state_map_",gsub("-","_",Sys.Date()),".png",sep=""), 
-    res=800, width = 18, height = 16, units = "in")
-states_data %>%
-  group_by(the_day,in_state) %>%
-  filter(!is.na(in_state)) %>%
-  mutate(ct=n()) %>%
-# filter("2023-02-01" < the_day & the_day >"2023-01-01") %>%
-  ggplot()+
-  geom_line(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
-  geom_point(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
-  labs(title = paste("Articles mentioning a US state, ",format(min(states_data$the_day),"%m/%d")," - ",
-                     format(max(states_data$the_day),"%m/%d"),sep=""),
-       subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
-                        as.numeric(table(ds$region)[3][1])," articles, region: USA ( total dataset N =",dim(ds)[1],")"),
-       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu\n"),sep="",
-       colour="Google News search term: ")+
-  xlab(element_blank())+
-  ylab("number of articles")+
-  theme_dark()+
-  theme(legend.position = "bottom", 
-        panel.grid = element_blank(), panel.border = element_blank(), 
-        axis.text.x = element_text(colour="white"),
-        axis.text.y = element_text(colour="white"),
-        legend.background = element_rect("black"),
-        legend.box.background = element_rect("black"),
-        legend.key = element_rect("black"),
-        plot.background = element_rect("black"), panel.background =element_rect("black"),
-        text=element_text(colour="white"))+
-  scale_color_brewer(palette = "Spectral")+
-  facet_wrap(in_state~.)
-dev.off()
-
-png(filename = paste("state_map_",gsub("-","_",Sys.Date()),".png",sep=""), 
-    res=800, width = 18, height = 16, units = "in")
-states_data %>%
-  group_by(the_day,in_state) %>%
-  filter(!is.na(in_state)) %>%
-  mutate(ct=n()) %>%
-  # filter("2023-02-01" < the_day & the_day >"2023-01-01") %>%
-  ggplot()+
-  geom_line(aes(x=the_day,y=ct,color="orange", colour="daily"))+
-  geom_point(aes(x=the_day,y=ct,color="orange", colour="daily"))+
-  labs(title = paste("Articles mentioning a US state, ",format(min(states_data$the_day),"%m/%d")," - ",
-                     format(max(states_data$the_day),"%m/%d"),sep=""),
-       subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
-                        as.numeric(table(ds$region)[3][1])," articles, region: USA ( total dataset N =",dim(ds)[1],")"),
-       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu\n"),sep="",
-       colour="Google News search term: ")+
-  xlab(element_blank())+
-  ylab("number of articles")+
-  theme_dark()+
-  theme(legend.position = "none", 
-        panel.grid = element_blank(), panel.border = element_blank(), 
-        axis.text.x = element_text(colour="white"),
-        axis.text.y = element_text(colour="white"),
-        legend.background = element_rect("black"),
-        legend.box.background = element_rect("black"),
-        legend.key = element_rect("black"),
-        plot.background = element_rect("black"), panel.background =element_rect("black"),
-        text=element_text(colour="white"))+
-  scale_color_brewer(palette = "Spectral")+
-  facet_wrap(in_state~.)
-dev.off()
-
-
 ds %>%
   mutate(in_state = 
            case_when(
@@ -323,7 +253,7 @@ sd_ds %>% filter(in_state %in% states) %>%
   select(in_state, pullURL, keyword) %>%
   group_by(in_state, pullURL, keyword) %>%
   summarize(num_urls = n()) %>% filter(num_urls>0) %>%
-  filter(in_state=="Texas") %>% View()
+  filter(in_state=="Texas") %>% as_tibble()
 
 sd_ds %>% filter(in_state %in% states) %>%
 select(region, the_day, pullURL, in_state) %>% 
