@@ -59,6 +59,7 @@ grid.arrange(
 
 
 {
+ grid.arrange( 
   grid.arrange(
     ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>%
       filter(region!="all regions") %>%
@@ -81,16 +82,14 @@ grid.arrange(
       scale_color_brewer(palette = "Spectral")
     ,
     
-    ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
-      filter(region!="all regions") %>%
+    ds %>%
       ggplot()+
-      geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
-      geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
-      labs(title = "Key topics in article excerpt, stratified by search term & region",
-           subtitle = "color indicates most frequently discussed topic",
-           caption=paste("updated",Sys.time()))+
-      xlab(element_blank())+
-      ylab("number of articles")+
+      geom_bar(aes(x=the_day, fill=topic), position="fill")+
+      facet_grid(keyword~region)+
+      theme_bw()+
+      theme(legend.position = "bottom")+
+      scale_fill_discrete(name="keyword")+
+      labs(y="proportion of articles",x=element_blank())+
       theme_dark()+
       scale_size_continuous(guide = "none")+
       scale_alpha_continuous(guide="none")+
@@ -100,10 +99,35 @@ grid.arrange(
             panel.grid.minor = element_line(linetype = "dotted"),
             panel.grid.major = element_line(linetype = "dotted"), legend.key = element_rect("black"),
             panel.background = element_rect("black"),
-            legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))+
-      facet_grid(region~keyword)
-    , ncol=2, heights=c(1.5,2))
+            legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))
+    ,ncol=2),
+    
+  ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
+    filter(region!="all regions") %>%
+    ggplot()+
+    geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
+    geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
+    labs(title = "Key topics in article excerpt, stratified by search term & region",
+         subtitle = "color indicates most frequently discussed topic",
+         caption=paste("updated",Sys.time()))+
+    xlab(element_blank())+
+    ylab("number of articles")+
+    theme_dark()+
+    scale_size_continuous(guide = "none")+
+    scale_alpha_continuous(guide="none")+
+    scale_color_brewer(palette = "Spectral")+
+    theme(text=element_text(colour="white"),
+          legend.position = "bottom",legend.background = element_rect("black"),
+          panel.grid.minor = element_line(linetype = "dotted"),
+          panel.grid.major = element_line(linetype = "dotted"), legend.key = element_rect("black"),
+          panel.background = element_rect("black"),
+          legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))+
+    facet_grid(region~keyword)
+    
+  , heights=c(1.5,2)
+  )
 }
+
 
 
 # generate dark mode table for states 
