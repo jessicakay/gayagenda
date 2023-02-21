@@ -104,4 +104,4 @@ e+theme_dark()+
         panel.background = element_rect("black"),
         legend.background = element_rect("black"),
         legend.box.background = element_rect("black"),legend.key = element_rect("black"),
-        text = element_text(colour = "white"))
+        text = element_text(colour = "white")) -> e_minor

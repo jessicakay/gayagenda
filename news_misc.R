@@ -56,4 +56,5 @@ kw+theme_dark()+
         legend.background = element_rect("black"),
         legend.key = element_rect("black"),
         text = element_text(colour = "white"),
-        panel.grid = element_blank())
+        panel.grid = element_blank())+
+  scale_color_brewer(palette = "Reds")
