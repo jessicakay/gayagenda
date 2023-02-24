@@ -69,15 +69,9 @@ kw+theme_dark()+
 
 states_data %>%
   mutate(week=case_when(
-    the_day >= the_day-7 ~ "past 7 days",
-    the_day <= the_day-14 & the_day > the_day-7 ~ "prior week"
-  )
-  ) %>% select(week) %>% table()
-
-filter("2023-02-01" < the_day & the_day >"2023-01-01") 
-
-
-states_data %>%
+    the_day >= today()-7 ~ "past 7 days",
+    the_day >= today()-14 & the_day < today()-7 ~ "prior week")
+    ) %>%
   group_by(the_day,in_state) %>%
   filter(!is.na(in_state)) %>%
   mutate(ct=n()) %>%
@@ -104,4 +98,4 @@ states_data %>%
         plot.background = element_rect("black"), panel.background =element_rect("black"),
         text=element_text(colour="white"))+
   scale_color_brewer(palette = "Spectral")+
-  facet_wrap(in_state~.)
+  facet_grid(in_state~.)
