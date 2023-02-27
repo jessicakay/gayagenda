@@ -73,7 +73,7 @@ states_data %>%
     the_day >= today()-14 & the_day < today()-7 ~ "prior week")
     ) %>%
   group_by(the_day,in_state) %>%
-  filter(!is.na(in_state)) %>%
+  filter(!is.na(in_state) & region!="all regions") %>%
   mutate(ct=n()) %>%
   # filter("2023-02-01" < the_day & the_day >"2023-01-01") %>%
   ggplot()+
@@ -99,3 +99,10 @@ states_data %>%
         text=element_text(colour="white"))+
   scale_color_brewer(palette = "Spectral")+
   facet_grid(in_state~.)
+
+
+ds %>% group_by(pullURL,keyword) %>% 
+  summarize(freq=n()) %>% 
+  filter(freq>9) %>%
+  arrange(by=rev(freq))
+

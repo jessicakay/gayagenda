@@ -126,7 +126,7 @@ states_data %>%
   theme_dark()+
   theme(legend.position = "none", 
         panel.grid = element_blank())+
-  facet_wrap(in_state~.) #-> state1
+  facet_wrap(in_state~.)
 
   states_data %>% group_by(in_state) %>%mutate(ct=n()) %>%
   filter(!is.na(in_state)) %>%
