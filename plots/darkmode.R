@@ -175,7 +175,7 @@ filter(!is.na(in_state)) %>%
 # eradicationist rehtoric plot
 
 ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
-  filter(region!="all regions") %>%
+  filter(region=="USA") %>%
   ggplot()+
   geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
   geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
@@ -190,8 +190,8 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>%
   scale_color_brewer(palette = "Spectral")+
   theme(text=element_text(colour="white"),
         legend.position = "bottom",legend.background = element_rect("black"),
-        panel.grid.minor = element_line(linetype = "dotted"),
-        panel.grid.major = element_line(linetype = "dotted"), legend.key = element_rect("black"),
+        panel.grid.minor = element_line(linetype = "none"),
+        panel.grid.major = element_line(linetype = "none"), legend.key = element_rect("black"),
         panel.background = element_rect("black"),
         legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))+
   facet_grid(region~keyword)
