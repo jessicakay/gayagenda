@@ -165,7 +165,6 @@ filter(!is.na(in_state)) %>%
         axis.text.y = element_text(colour="white"),
         legend.background = element_rect("black"),
         legend.box.background = element_rect("black"),
-        legend.title = element_ttext("google search keyword"),
         legend.key = element_rect("black"),
         plot.background = element_rect("black"), panel.background =element_rect("black"),
         text=element_text(colour="white"))+
@@ -182,8 +181,7 @@ grid.arrange(
     geom_line(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
     geom_point(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
     labs(title = "Articles about trans people in US + UK news media",
-         subtitle = cappy,
-         caption="github.com/jessicakay/gayagenda | @jessdkant")+
+         subtitle = cappy)+
     xlab(element_blank())+
     ylab("number of articles")+
     facet_grid(region~.)+
@@ -193,8 +191,9 @@ grid.arrange(
           legend.background = element_rect("black"),
           legend.box.background = element_rect("black"),legend.key = element_rect("black"),
           text = element_text(colour = "white"),
-          legend.position = "bottom")+
-    scale_color_brewer(palette = "Spectral")
+          legend.position = "right")+
+    scale_color_brewer(palette = "Spectral")+
+    scale_fill_discrete(name="google search keyword")
   ,
 
   ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
@@ -203,8 +202,7 @@ grid.arrange(
   geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
   geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
   labs(title = "Key topics in article excerpt, stratified by search term & region",
-       subtitle = "color indicates most frequently discussed topic",
-       caption=paste("updated",Sys.time()))+
+       caption=paste("updated",Sys.time(),"| [ github.com/jessicakay/gayagenda ] | @jessdkant"))+
   xlab(element_blank())+
   ylab("number of articles")+
   theme_dark()+
@@ -212,11 +210,11 @@ grid.arrange(
   scale_alpha_continuous(guide="none")+
   scale_color_brewer(palette = "Spectral")+
   theme(text=element_text(colour="white"),
-        legend.position = "bottom",legend.background = element_rect("black"),
+        legend.position = "right",legend.background = element_rect("black"),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(), legend.key = element_rect("black"),
         panel.background = element_rect("black"),
         legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))+
-  facet_grid(region~keyword)
+  facet_grid(region~keyword,switch = "y")
 
 , heights=c(0.75,2))
