@@ -171,3 +171,28 @@ filter(!is.na(in_state)) %>%
   scale_color_brewer(palette = "Spectral")+
   facet_wrap(in_state~.)
 
+
+# eradicationist rehtoric plot
+
+ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
+  filter(region!="all regions") %>%
+  ggplot()+
+  geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
+  geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
+  labs(title = "Key topics in article excerpt, stratified by search term & region",
+       subtitle = "color indicates most frequently discussed topic",
+       caption=paste("updated",Sys.time()))+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_dark()+
+  scale_size_continuous(guide = "none")+
+  scale_alpha_continuous(guide="none")+
+  scale_color_brewer(palette = "Spectral")+
+  theme(text=element_text(colour="white"),
+        legend.position = "bottom",legend.background = element_rect("black"),
+        panel.grid.minor = element_line(linetype = "dotted"),
+        panel.grid.major = element_line(linetype = "dotted"), legend.key = element_rect("black"),
+        panel.background = element_rect("black"),
+        legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))+
+  facet_grid(region~keyword)
+
