@@ -165,6 +165,7 @@ filter(!is.na(in_state)) %>%
         axis.text.y = element_text(colour="white"),
         legend.background = element_rect("black"),
         legend.box.background = element_rect("black"),
+        legend.title = element_ttext("google search keyword"),
         legend.key = element_rect("black"),
         plot.background = element_rect("black"), panel.background =element_rect("black"),
         text=element_text(colour="white"))+
@@ -174,7 +175,29 @@ filter(!is.na(in_state)) %>%
 
 # eradicationist rehtoric plot
 
-ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
+grid.arrange(
+  ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>%
+    filter(region=="USA") %>%
+    ggplot()+
+    geom_line(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
+    geom_point(aes(x=the_day,y=ct,color=keyword, colour="daily"))+
+    labs(title = "Articles about trans people in US + UK news media",
+         subtitle = cappy,
+         caption="github.com/jessicakay/gayagenda | @jessdkant")+
+    xlab(element_blank())+
+    ylab("number of articles")+
+    facet_grid(region~.)+
+    theme_dark()+
+    theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+          panel.background = element_rect("black"),
+          legend.background = element_rect("black"),
+          legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+          text = element_text(colour = "white"),
+          legend.position = "bottom")+
+    scale_color_brewer(palette = "Spectral")
+  ,
+
+  ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
   filter(region=="USA") %>%
   ggplot()+
   geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
@@ -190,9 +213,10 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>%
   scale_color_brewer(palette = "Spectral")+
   theme(text=element_text(colour="white"),
         legend.position = "bottom",legend.background = element_rect("black"),
-        panel.grid.minor = element_line(linetype = "none"),
-        panel.grid.major = element_line(linetype = "none"), legend.key = element_rect("black"),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(), legend.key = element_rect("black"),
         panel.background = element_rect("black"),
         legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))+
   facet_grid(region~keyword)
 
+, heights=c(0.75,2))
