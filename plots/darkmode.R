@@ -210,11 +210,12 @@ grid.arrange(
   scale_alpha_continuous(guide="none")+
   scale_color_brewer(palette = "Spectral")+
   theme(text=element_text(colour="white"),
+        
         legend.position = "right",legend.background = element_rect("black"),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(), legend.key = element_rect("black"),
         panel.background = element_rect("black"),
         legend.box.background = element_rect("black"), plot.background = element_rect("black",colour = "black"))+
-  facet_grid(region~keyword,switch = "y")
+  facet_grid(region~keyword)
 
 , heights=c(0.75,2))
