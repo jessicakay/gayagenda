@@ -68,6 +68,7 @@ kw+theme_dark()+
 
 
 states_data %>%
+  filter(the_day<the_day-14) %>%
   mutate(week=case_when(
     the_day >= today()-7 ~ "past 7 days",
     the_day >= today()-14 & the_day < today()-7 ~ "prior week")
