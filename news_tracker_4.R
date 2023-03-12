@@ -60,22 +60,10 @@ pullStats <- function(){
 
 refresh("all")
 pullStats()
+
   
 # stratify by keyword
 
-ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
-  geom_line(aes(x=the_day,y=ct,color=region, colour="daily"))+
-  geom_point(aes(x=the_day,y=ct,color=region, colour="daily"))+
-  labs(title = "Articles about trans people in US + UK news media",
-       subtitle = "https://tech.lgbt/@jessdkant",
-       caption=paste("updated",Sys.time()))+
-  xlab(element_blank())+
-  ylab("number of articles")+
-  theme_bw()+
-  theme(legend.position = "none")+
-  facet_grid(keyword~region) -> kw
-
-run_nlp<-function(){
 ds %>% 
   mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
   mutate(topic=case_when(
@@ -89,7 +77,20 @@ ds %>%
     str_detect(textcontent,"(?i)legislat|(?i)bill|(?i)lawmaker|(?i)reform|(?i)senat|(?i)ban|(?i)house\\s(?i)repre") == TRUE ~ "legislation",
     str_detect(textcontent,"(?i)medical|(?i)healthcare|(?i)hormone|(?i)medication|(?i)surgery|(?i)physician") == TRUE ~ "healthcare",
     str_detect(textcontent,"(?i)murder|(?i)rape|(?i)rapist|(?i)kidnap|(?i)killed|(?i)offender|(?i)predator|(?i)assault") == TRUE ~ "crime")) ->> ds
-  }
+
+
+ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
+  geom_line(aes(x=the_day,y=ct,color=region, colour="daily"))+
+  geom_point(aes(x=the_day,y=ct,color=region, colour="daily"))+
+  labs(title = "Articles about trans people in US + UK news media",
+       subtitle = "https://tech.lgbt/@jessdkant",
+       caption=paste("updated",Sys.time()))+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_bw()+
+  theme(legend.position = "none")+
+  facet_grid(keyword~region) -> kw
+
 
 ds %>%
   ggplot()+
