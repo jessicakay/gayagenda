@@ -107,3 +107,4 @@ ds %>% group_by(pullURL,keyword) %>%
   filter(freq>9) %>%
   arrange(by=rev(freq))
 
+ds[which(str_detect(ds$EntryURL,pattern = "dailywire") & ds$region == "USA"),] %>% select(EntryPublished,EntryTitle,keyword) %>% arrange(keyword)
