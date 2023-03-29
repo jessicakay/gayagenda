@@ -77,16 +77,16 @@ pullStats()
 ds %>% 
   mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
   mutate(topic=case_when(
-    str_detect(textcontent,"(?i)sport|(?i)athlet|(?i)competiti|(?i)swim|(?i)hockey|(?i)rugby") == TRUE ~ "sports",
+    str_detect(textcontent,"(?i)sport|(?i)athlet|(?i)competiti|(?i)swim|(?i)hockey|(?i)rugby|(?i)soccer|(?i)football") == TRUE ~ "sports",
     str_detect(textcontent,"(?i)restroom|(?i)bathroom|(?i)locker|(?i)naked|(?i)ymca")== TRUE ~ "bathrooms",
     str_detect(textcontent,"(?i)school|(?i)educat|(?i)universit|(?i)college|(?i)dormit|(?i)student") == TRUE ~ "education",
     str_detect(textcontent,"(?i)detrans|(?i)desist|(?i)de-trans|(?i)regret") == TRUE ~ "detransition",
     str_detect(textcontent,"(?i)mental\\s(?i)ilness|(?i)disorder|(?i)therapy|(?i)psychiatr|(?i)psychology") == TRUE ~ "therapy",
     str_detect(textcontent,"(?i)supreme|(?i)court|(?i)discriminat|(?i)lawsuit|(?i)legal|(?i)lawyer") == TRUE ~ "judicidial",
     str_detect(textcontent,"(?i)actor|(?i)film|(?i)movie|(?i)television|(?i)author|(?i)actress|(?i)singer") == TRUE ~ "entertainment",
-    str_detect(textcontent,"(?i)legislat|(?i)bill|(?i)lawmaker|(?i)reform|(?i)senat|(?i)ban|(?i)house\\s(?i)repre") == TRUE ~ "legislation",
-    str_detect(textcontent,"(?i)medical|(?i)healthcare|(?i)hormone|(?i)medication|(?i)surgery|(?i)physician") == TRUE ~ "healthcare",
-    str_detect(textcontent,"(?i)murder|(?i)rape|(?i)rapist|(?i)kidnap|(?i)killed|(?i)offender|(?i)predator|(?i)assault") == TRUE ~ "crime")) ->> ds
+    str_detect(textcontent,"(?i)legislat|(?i)bill|(?i)lawmaker|(?i)reform|(?i)senat|(?i)ban|(?i)house\\s(?i)repre|(?i)filibuster") == TRUE ~ "legislation",
+    str_detect(textcontent,"(?i)medical|(?i)healthcare|(?i)hormone|(?i)medication|(?i)surgery|(?i)physician|(?i)blocker") == TRUE ~ "healthcare",
+    str_detect(textcontent,"(?i)murder|(?i)rape|(?i)rapist|(?i)kidnap|(?i)killed|(?i)offender|(?i)predator|(?i)assault|(?i)shooter|(?i)shooting") == TRUE ~ "crime")) ->> ds
 
 
 ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
