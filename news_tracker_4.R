@@ -41,6 +41,7 @@ refresh<-function(arg="all"){
     exds %>% group_by(EntryTitle) %>% as_tibble(as.data.frame()) ->> exds
     assign("exds",exds,envir = .GlobalEnv)
   }
+  pullStats()
   assign("ds",ds,envir = .GlobalEnv)
   }
 

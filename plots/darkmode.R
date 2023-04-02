@@ -31,7 +31,7 @@ grid.arrange(
           legend.box.background = element_rect("black"),legend.key = element_rect("black"),
           text = element_text(colour = "white"),
           legend.position = "bottom")+
-    scale_color_brewer(palette = "Spectral")
+    scale_color_brewer(palette = "Pastel")
 ,
 
   ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
