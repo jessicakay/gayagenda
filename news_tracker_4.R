@@ -41,6 +41,9 @@ refresh<-function(arg="all"){
     exds %>% group_by(EntryTitle) %>% as_tibble(as.data.frame()) ->> exds
     assign("exds",exds,envir = .GlobalEnv)
   }
+  ds %>% mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
+    mutate(the_day=as.Date(mdy(theday))) ->> ds
+  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) ->> ds$pullURL
   pullStats()
   assign("ds",ds,envir = .GlobalEnv)
   }
