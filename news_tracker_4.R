@@ -46,10 +46,7 @@ refresh<-function(arg="all"){
   }
 
 pullStats <- function(){
-  ds %>% mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
-    mutate(the_day=as.Date(mdy(theday))) ->> ds
-  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> ds$pullURL
-  min_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% quantile(c(.98)))
+   min_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% quantile(c(.98)))
   max_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% max)
   month(head(sort(ds$the_day))[1]) -> start_month
   day(head(sort(ds$the_day))[1]) -> start_day
@@ -75,9 +72,15 @@ pullStats()
   
 # stratify by keyword
 
+ 
 ds %>% 
   mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
-  mutate(topic=case_when(
+  mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
+  mutate(the_day=as.Date(mdy(theday))) ->> ds
+  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> ds$pullURL
+
+ds %>%
+    mutate(topic=case_when(
     str_detect(textcontent,"(?i)sport|(?i)athlet|(?i)competiti|(?i)swim|(?i)hockey|(?i)rugby|(?i)soccer|(?i)football") == TRUE ~ "sports",
     str_detect(textcontent,"(?i)restroom|(?i)bathroom|(?i)locker|(?i)naked|(?i)ymca")== TRUE ~ "bathrooms",
     str_detect(textcontent,"(?i)school|(?i)educat|(?i)universit|(?i)college|(?i)dormit|(?i)student") == TRUE ~ "education",
