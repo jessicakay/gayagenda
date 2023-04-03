@@ -219,3 +219,37 @@ grid.arrange(
   facet_grid(region~keyword)
 
 , heights=c(0.75,2))
+
+
+# tracking legislation articles
+
+grid.arrange(
+  ds %>% 
+    filter(tag_leg==1) %>%
+    group_by(the_day,tag_leg) %>% mutate(ct=n()) %>%
+    filter(region=="all regions") %>%
+    ggplot()+
+    geom_line(aes(x=the_day,y=ct,colour="yellow"))+
+    theme_dark()+
+    theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+          panel.background = element_rect("black"),
+          legend.background = element_rect("black"),
+          legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+          text = element_text(colour = "white"),
+          legend.position = "bottom")
+  ,
+  ds %>% 
+    filter(tag_leg==1) %>%
+    group_by(the_day,keyword,tag_leg) %>% mutate(ct=n()) %>%
+    filter(region=="all regions") %>%
+    ggplot()+
+    geom_line(aes(x=the_day,y=ct,colour=keyword))+
+    theme_dark()+
+    theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+          panel.background = element_rect("black"),
+          legend.background = element_rect("black"),
+          legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+          text = element_text(colour = "white"),
+          legend.position = "bottom")+
+    scale_color_brewer(palette = "Reds")
+)
