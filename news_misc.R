@@ -2,7 +2,7 @@
 # experimental NLP section, keywords used to further tag items
 
 ds$tag_sports <- ifelse(grepl("(?i)sport|(?i)athletic|(?i)athlete|(?i)competition", ds$EntryContent),1,0)
-ds$tag_leg    <- ifelse(grepl("(?i)bill|(?i)legislat",                              ds$EntryContent),1,0)
+ds$tag_leg    <- ifelse(grepl("(?i)bill|(?i)legislat|(?i)senat|(?i)representative",                              ds$EntryContent),1,0)
 ds$tag_school <- ifelse(grepl("(?i)school|(?i)educat|(?i)universit",                ds$EntryContent),1,0)
 ds$tag_sglsex <- ifelse(grepl("(?i)women\\sonly|(?i)single-sex|(?i)sex-based",      ds$EntryContent),1,0)
 
