@@ -41,9 +41,8 @@ refresh<-function(arg="all"){
     exds %>% group_by(EntryTitle) %>% as_tibble(as.data.frame()) ->> exds
     assign("exds",exds,envir = .GlobalEnv)
   }
-  return(pullStats())
   assign("ds",ds,envir = .GlobalEnv)
-  }
+}
 
 pullStats <- function(){
    min_arts <- as.numeric(summarize(group_by(ds %>% filter(!is.na(pullURL)), pullURL),ct=n())$ct %>% quantile(c(.98)))
