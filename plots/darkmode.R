@@ -107,7 +107,7 @@ states_data %>%
   # filter("2023-02-01" < the_day & the_day >"2023-01-01") %>%
   ggplot()+
   geom_line(aes(x=the_day,y=ct,color="orange", colour="daily"))+
-  geom_point(aes(x=the_day,y=ct,color="orange", colour="daily"))+
+#  geom_point(aes(x=the_day,y=ct,color="orange", colour="daily"))+
   labs(title = paste("Articles mentioning a US state, ",format(min(states_data$the_day),"%m/%d")," - ",
                      format(max(states_data$the_day),"%m/%d"),sep=""),
        subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
@@ -235,8 +235,8 @@ grid.arrange(
           panel.background = element_rect("black"),
           legend.background = element_rect("black"),
           legend.box.background = element_rect("black"),legend.key = element_rect("black"),
-          text = element_text(colour = "white"),
-          legend.position = "bottom")
+          text = element_text(colour = "black"),
+          legend.position = "none")
   ,
   ds %>% 
     filter(tag_leg==1) %>%
@@ -251,5 +251,36 @@ grid.arrange(
           legend.box.background = element_rect("black"),legend.key = element_rect("black"),
           text = element_text(colour = "white"),
           legend.position = "bottom")+
+    labs(x = element_blank())+
     scale_color_brewer(palette = "Reds")
 )
+
+states_data %>%
+  group_by(the_day,in_state) %>%
+  filter(!is.na(in_state)) %>%
+  mutate(ct=n()) %>%
+  # filter("2023-02-01" < the_day & the_day >"2023-01-01") %>%
+  ggplot()+
+  geom_line(aes(x=the_day,y=ct,color="orange", colour="daily"))+
+  geom_abline(aes(y=as.Date("2023-03-22"),x=1))+
+  #  geom_point(aes(x=the_day,y=ct,color="orange", colour="daily"))+
+  labs(title = paste("Articles mentioning a US state, ",format(min(states_data$the_day),"%m/%d")," - ",
+                     format(max(states_data$the_day),"%m/%d"),sep=""),
+       subtitle = paste(round(dim(states_data[which(!is.na(states_data$in_state)),])[1]/as.numeric(table(ds$region)[3][1])*100,2),"% out of ",
+                        as.numeric(table(ds$region)[3][1])," articles, region: USA ( total dataset N =",dim(ds)[1],")"),
+       caption=paste("updated",Sys.time()," \ngithub.com/jessicakay/gayagenda\njkant@bu.edu\n"),sep="",
+       colour="Google News search term: ")+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_dark()+
+  theme(legend.position = "none", 
+        panel.grid = element_blank(), panel.border = element_blank(), 
+        axis.text.x = element_text(colour="white",angle = 90),
+        axis.text.y = element_text(colour="white"),
+        legend.background = element_rect("black"),
+        legend.box.background = element_rect("black"),
+        legend.key = element_rect("black"),
+        plot.background = element_rect("black"), panel.background =element_rect("black"),
+        text=element_text(colour="white"))+
+  scale_color_brewer(palette = "Spectral")+
+  facet_wrap(in_state~.)
