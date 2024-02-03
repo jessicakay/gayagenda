@@ -12,12 +12,12 @@
     library(googlesheets4) } 
  
 # clean OAuth tokens and authenticate
-#
-#   detach(package:googlesheets4) ; googlesheets4::gs4_auth()
-#   headers <- c("EntryPublished","EntryTitle","EntryURL","EntryContent","FeedTitle","FeedURL","keyword","region")
-#   headers   <- as.data.frame(cbind(headers))
-#   googlesheets4::sheet_append(tsheetall,as.vector(headers),sheet =1) # inserts headers into blank sheet, only run first time
-#
+
+   detach(package:googlesheets4) ; googlesheets4::gs4_auth()
+   headers <- c("EntryPublished","EntryTitle","EntryURL","EntryContent","FeedTitle","FeedURL","keyword","region")
+   headers   <- as.data.frame(cbind(headers))
+   googlesheets4::sheet_append(tsheetall,as.vector(headers),sheet =1) # inserts headers into blank sheet, only run first time
+
 
 refresh<-function(arg="all"){
   if(arg=="pull" | arg=="all"){
