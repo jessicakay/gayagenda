@@ -10,13 +10,14 @@ ds$tag_sglsex <- ifelse(grepl("(?i)women\\sonly|(?i)single-sex|(?i)sex-based",  
 colIDs <- names(select(ds, contains("tag_")))
 
 ds[which(ds$tag_leg==1),] %>% select(tag_leg, region,the_day) %>% ggplot()+
-  geom_bar(aes(x=the_day,fill=region))
+  geom_bar(aes(x=the_day,fill=region),position = "stack")+theme_void()
 
 
 ds %>% mutate(timetime=as.POSIXct(thetime)) %>%
   ggplot()+
   geom_point(aes(x=the_day,y=timetime,color=topic))+
-  facet_grid(keyword~region)
+  facet_grid(keyword~region)+
+  theme_minimal()
 
 
 ds %>% tidyr::unite("tags",colIDs, sep = ",", remove = FALSE) %>% select(tags) %>% View()
