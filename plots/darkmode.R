@@ -10,6 +10,9 @@ paste(num_selected," headlines, ",
       " |  (",perc_selected,"% of total dataset (N=",dim(ds)[1],")",sep="") -> cappy
 
 
+
+
+
 # dark mode
 
 grid.arrange(
@@ -119,7 +122,7 @@ states_data %>%
   theme_dark()+
   theme(legend.position = "none", 
         panel.grid = element_blank(), panel.border = element_blank(), 
-        axis.text.x = element_text(colour="white",angle = 90),
+        axis.text.x = element_blank(),
         axis.text.y = element_text(colour="white"),
         legend.background = element_rect("black"),
         legend.box.background = element_rect("black"),
