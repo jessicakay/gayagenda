@@ -13,3 +13,9 @@ _Jess_
 ### Follow its progress on Mastodon: 
 _[tech.lgbt/@jessdkant](https://tech.lgbt/@jessdkant)_
 
+==== 
+
+Datasets uploaded: 
+
+* the first year of data is UP! go to "datasets" to see them.
+* note: one of the feeds disconnected over the course of the year leading to an incomplete dataset for the keyword “gender identity” set to UK regional settings in the primary dataset. The data before and after the outage remains in the dataset, but anyone doing regional analysis should exclude that keyword/region combination. The feed is back up and running, and every half year or so I’ll upload a new dataset.
