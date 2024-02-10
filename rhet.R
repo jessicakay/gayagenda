@@ -68,8 +68,9 @@ datapool %>%
   geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE,method="lm")+
   xlab(element_blank())+
   ylab("number of articles")+
+  labs(caption=paste("jessk.org/blog | ",Sys.time()))+
   ggdark::dark_theme_minimal()+
-  theme(legend.position = "bottom")+
+  theme(legend.position = "none")+
   theme(panel.grid.minor = element_blank(),
         panel.background = element_rect(fill=NA,colour="black"),
         panel.border = element_rect(fill=NA,colour="black"),
@@ -77,18 +78,24 @@ datapool %>%
         plot.background = element_rect("black",colour = "black"))+
   scale_color_brewer(palette = "PuRd") -> full_spread
 
+# mutate(qt=case_when(
+#  my=="2023.2" ~ "Apr - Jun",
+#  my=="2023.3" ~ "Jul - Sep",
+#  my=="2023.4" ~ "Oct - Dec",
+#  my=="2024.1" ~ "Jan - Feb")) %>%
+  
+
 datapool %>%  
   ggplot()+
   geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
   geom_line(aes(x=the_day,y=ct,color=keyword),alpha=0.1)+
   geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE,method="lm")+
   labs(title = "frequency of news articles in Google News index by keyword",
-       subtitle = "All regions, by quarter",
-       caption=paste("github.com/jessicakay/gayagenda | updated",Sys.time()))+
+       subtitle = "All regions, by quarter")+
   xlab(element_blank())+
   ylab("number of articles")+
   ggdark::dark_theme_minimal()+
-  theme(legend.position = "none")+
+  theme(legend.position = "top")+
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         plot.background = element_rect("black",colour = "black"))+
