@@ -68,9 +68,9 @@ datapool %>%
   geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE,method="lm")+
   xlab(element_blank())+
   ylab("number of articles")+
-  labs(caption=paste("jessk.org/blog | ",Sys.time()))+
+  labs(caption=paste("jessk.org/blog | github.com/jessicakay/gayagenda | ",Sys.time()))+
   ggdark::dark_theme_minimal()+
-  theme(legend.position = "none")+
+  theme(legend.position = "bottom")+
   theme(panel.grid.minor = element_blank(),
         panel.background = element_rect(fill=NA,colour="black"),
         panel.border = element_rect(fill=NA,colour="black"),
@@ -90,12 +90,12 @@ datapool %>%
   geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
   geom_line(aes(x=the_day,y=ct,color=keyword),alpha=0.1)+
   geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE,method="lm")+
-  labs(title = "frequency of news articles in Google News index by keyword",
+  labs(title = "frequency of news articles in Google News",
        subtitle = "All regions, by quarter")+
   xlab(element_blank())+
   ylab("number of articles")+
   ggdark::dark_theme_minimal()+
-  theme(legend.position = "top")+
+  theme(legend.position = "none")+
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
         plot.background = element_rect("black",colour = "black"))+
@@ -103,5 +103,6 @@ datapool %>%
   facet_grid(.~my,scales = "free_x") -> by_quarter
 
 
+png(filename = "8_months_all_regions.png",width = 5000, height = 4500, res = 300)
 grid.arrange(by_quarter,full_spread,ncol=c(1)) 
-
+dev.off()
