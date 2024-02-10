@@ -1,8 +1,5 @@
+refresh("ex")
 
-exds %>% 
-  mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
-  mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
-  mutate(the_day=as.Date(mdy(theday))) ->> exds
 substring(str_extract(exds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> exds$pullURL
 
 exds[(exds$keyword!="woke ideology"),][c(-8)] -> exds_cleaned
