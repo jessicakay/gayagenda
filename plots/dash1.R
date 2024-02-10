@@ -26,6 +26,7 @@ ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   facet_grid(keyword~region) -> p2
 
 
+
 ds %>% group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% ggplot()+
   geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.05)+
   geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct))+

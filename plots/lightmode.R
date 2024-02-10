@@ -24,19 +24,32 @@ ds %>%
   facet_grid(.~keyword)
 
 ds %>% 
-  filter(keyword=="transgender") %>%
   group_by(the_day,region,keyword) %>% 
   mutate(ct=n()) %>% 
   ggplot(aes(the_day,ct,color=region))+
   geom_point()+
-    theme(
-    legend.position = "bottom",
-  axis.text.x = element_text(colour="white",angle = 90))+  
+  theme_void()+
+  theme(
+    legend.position = "bottom")+
   labs(title = "Articles about trans people in US + UK news media",
        subtitle = "jessk.org/blog",
        caption=paste("updated",Sys.time()," | @jessdkant.bsky.soc"))+
   facet_grid(.~keyword)
 
+
+ds %>% 
+  filter(keyword=="transgender") %>%
+  group_by(the_day,region,keyword) %>% 
+  mutate(ct=n()) %>% 
+  ggplot(aes(the_day,ct,color=region))+
+  geom_point()+
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 90))+  
+  labs(title = "Articles about trans people in US + UK news media",
+       subtitle = "jessk.org/blog",
+       caption=paste("updated",Sys.time()," | @jessdkant.bsky.soc"))+
+  facet_grid(.~keyword)
 
 
 ds %>% 
@@ -44,12 +57,12 @@ ds %>%
   filter(region!="all regions")%>%
   group_by(the_day,region,keyword) %>% 
   mutate(ct=n()) %>% 
-  ggplot()+
-  geom_bar(aes(x=ct,fill=region),position="dodge")+
+  ggplot(aes(the_day,ct,color=region))+
+  geom_point()+
   theme_void()+
   theme(
     legend.position = "bottom")+
-  labs(title = "Articles about trans people in US + UK news media",
+  labs(title = "Distribution",
        subtitle = "jessk.org/blog",
        caption=paste("updated",Sys.time()," | @jessdkant.bsky.soc"))+
   facet_grid(.~keyword)
