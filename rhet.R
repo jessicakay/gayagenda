@@ -1,53 +1,17 @@
 refresh("ex")
 
-substring(str_extract(exds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> exds$pullURL
-
-exds[(exds$keyword!="woke ideology"),][c(-8)] -> exds_cleaned
 
 # write.csv(exds_cleaned,file = "negativevalencekws.csv")
 
 read.csv("/Users/jessa/Downloads/merged_news_feb22024.csv") -> nds
+read.csv("/Users/jessa/OneDrive/Documents/GitHub/misc/gayagenda/datasets/negativevalencekws.csv") -> exds_cleaned
+
+# exds[(exds$keyword!="woke ideology"),][c(-8)] -> exds_cleaned
+
 
 nds %>% 
   filter(region=="all regions") %>%
   select(names(exds_cleaned)) -> set1
-
-typeof(nds$theday)
-
-typeof(set1$the_day)
-typeof(exds_cleaned$the_day)
-
-exds_cleaned %>%
-  mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
-  mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
-  mutate(the_day=as.Date(mdy(theday))) %>%
-  filter(the_day > "2023-04-01") %>%
-  group_by(keyword,pullURL) %>% mutate(urlCount=n()) %>% select(urlCount)
-
-union(set1,exds_cleaned) %>%
-  mutate(textcontent = paste(EntryContent,EntryURL, EntryTitle)) %>%
-  mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
-  mutate(the_day=as.Date(mdy(theday))) %>%
-  filter(the_day > "2023-04-01") %>%
-  group_by(pullURL) %>% mutate(urlCount=n()) %>% select(urlCount)
-  
-  
-  group_by(the_day,region,keyword) %>% mutate(ct=n()) %>% 
-  ggplot()+
-  geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
-  geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE,method="lm")+
-  labs(title = "frequency of news articles in Google News index by keyword",
-       subtitle = "github.com/jessicakay/gayagenda",
-       caption=paste("updated",Sys.time()))+
-  xlab(element_blank())+
-  ylab("number of articles")+
-  ggdark::dark_theme_minimal()+
-  scale_size_continuous(guide = "none")+
-  theme(legend.position = "none")+
-  theme(panel.grid.minor = element_line(linetype = "dashed"),
-        panel.grid.major = element_line(linetype = "dashed"))+
-  scale_color_brewer(palette = "Spectral") +
-  facet_wrap(.~keyword)
   
 as.character(exds_cleaned$the_day)->exds_cleaned$the_day
 as.character(nds$the_day)->nds$the_day
@@ -57,10 +21,14 @@ union(set1,exds_cleaned) %>%
   mutate(theday=str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")) %>%
   mutate(the_day=as.Date(mdy(theday))) %>%
   filter(the_day> "2023-04-01") %>%
+  mutate(pullURL=substring(str_extract(EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z0-9]+?.?[a-z]+?.[a-z]/"), first=9)) %>%
   mutate(mnth=month(the_day)) %>%
+  group_by(EntryURL) %>%
+  mutate(numStory=n())%>%
+  ungroup()%>%
   mutate(my=quarter(the_day,with_year = T)) %>% 
-  group_by(the_day,keyword) %>% mutate(ct=n()) -> datapool 
-
+  group_by(the_day,keyword) %>% mutate(ct=n()) -> datapool
+  
 datapool %>%  
   ggplot()+
   geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
@@ -76,7 +44,7 @@ datapool %>%
         panel.border = element_rect(fill=NA,colour="black"),
         panel.grid.major = element_blank(), 
         plot.background = element_rect("black",colour = "black"))+
-  scale_color_brewer(palette = "PuRd") -> full_spread
+  scale_color_brewer(palette = "PuRd") 
 
 # mutate(qt=case_when(
 #  my=="2023.2" ~ "Apr - Jun",
@@ -103,6 +71,6 @@ datapool %>%
   facet_grid(.~my,scales = "free_x") -> by_quarter
 
 
-png(filename = "8_months_all_regions.png",width = 5000, height = 4500, res = 300)
+# png(filename = "8_months_all_regions.png",width = 5000, height = 4500, res = 300)
 grid.arrange(by_quarter,full_spread,ncol=c(1)) 
-dev.off()
+# dev.off()
