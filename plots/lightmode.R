@@ -81,4 +81,24 @@ ds %>%
        caption=paste("updated",Sys.time()," | @jessdkant.bsky.soc"))+
   facet_grid(.~keyword)
 
+
 View(ds[(ds$region=="UK"),])
+
+
+
+
+datapool %>%  
+  ggplot()+
+  geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
+  geom_line(aes(x=the_day,y=ct,color=keyword),alpha=0.1)+
+  geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE)+
+  labs(title = "frequency of news articles in Google News",
+       subtitle = "All regions, by quarter")+
+  xlab(element_blank())+
+  ylab("number of articles")+
+  theme_light()+
+  theme(legend.position = "none")+
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank())+
+  scale_color_brewer(palette = "Set1") +
+  facet_grid(.~my,scales = "free_x") 

@@ -31,12 +31,12 @@ union(set1,exds_cleaned) %>%
   
 datapool %>%  
   ggplot()+
-  geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
+  #geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
   geom_line(aes(x=the_day,y=ct,color=keyword),alpha=0.1)+
-  geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE,method="lm")+
+  geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE,)+
   xlab(element_blank())+
   ylab("number of articles")+
-  labs(caption=paste("jessk.org/blog | github.com/jessicakay/gayagenda | ",Sys.time()))+
+  labs(caption=paste("jessk.org/blog"))+
   ggdark::dark_theme_minimal()+
   theme(legend.position = "bottom")+
   theme(panel.grid.minor = element_blank(),
@@ -44,14 +44,7 @@ datapool %>%
         panel.border = element_rect(fill=NA,colour="black"),
         panel.grid.major = element_blank(), 
         plot.background = element_rect("black",colour = "black"))+
-  scale_color_brewer(palette = "PuRd") 
-
-# mutate(qt=case_when(
-#  my=="2023.2" ~ "Apr - Jun",
-#  my=="2023.3" ~ "Jul - Sep",
-#  my=="2023.4" ~ "Oct - Dec",
-#  my=="2024.1" ~ "Jan - Feb")) %>%
-  
+  scale_color_brewer(palette = "Spectral")  
 
 datapool %>%  
   ggplot()+
@@ -71,6 +64,49 @@ datapool %>%
   facet_grid(.~my,scales = "free_x") -> by_quarter
 
 
-# png(filename = "8_months_all_regions.png",width = 5000, height = 4500, res = 300)
-grid.arrange(by_quarter,full_spread,ncol=c(1)) 
+# png(filename = "long_smooth.png",width = 3000, height = 2000, res = 300)
+# full_spread 
 # dev.off()
+
+
+datapool %>%
+  select(EntryURL, pullURL) %>%
+  distinct(EntryURL) %>% as_tibble()
+
+# datapool %>%
+#  filter(pullURL=="www.dailysignal.com/") %>% 
+#  group_by(keyword,my) %>%
+#  mutate(npermonth=n()) -> dp
+
+datapool[which(grepl("(?)dailysignal|(?)christianpost|(?)washingtonexaminer|(?)dailywire|(?)www.foxnews|(?)breitbart.com",datapool$pullURL)),] -> dp
+datapool[which(grepl("(?)nbcnews|(?)msnbc|(?)www.cnn.com|(?)nytimes.com|(?)huffpost|(?)cbsnews",datapool$pullURL)),] -> dp
+
+dp %>%
+  ungroup() %>%
+  distinct(EntryURL,.keep_all = T)->dp
+
+write.csv(table(dp$mnth,dp$pullURL),"clipboard")
+
+
+#    select(mnth,keyword) %>%
+#    table() %>% write.csv("clipboard")
+
+
+
+
+write.csv(table(dp$mnth,dp$keyword),"clipboard")
+
+
+table(dp$mnth,dp$pullURL)
+
+
+c("www.dailysignal.com/",
+  "www.christanpost.com/",
+  "www.washingtonexaminer.com/",
+  "www.dailywire.com/",
+  "www.foxnews.com/",
+  "www.breitbart.com/"
+  ) -> six_sources
+
+dp$pullURL
+
