@@ -1,5 +1,5 @@
 
-# gayagenda config files
+# config files
 # jessica kant, 2024 
 
 # package list
