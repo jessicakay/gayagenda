@@ -16,7 +16,7 @@
    detach(package:googlesheets4) ; googlesheets4::gs4_auth()
    headers <- c("EntryPublished","EntryTitle","EntryURL","EntryContent","FeedTitle","FeedURL","keyword","region")
    headers   <- as.data.frame(cbind(headers))
-   googlesheets4::sheet_append(tsheetall,as.vector(headers),sheet =1) # inserts headers into blank sheet, only run first time
+   # googlesheets4::sheet_append(tsheetall,as.vector(headers),sheet =1) # inserts headers into blank sheet, only run first time
 
 
 refresh<-function(arg="all"){
@@ -59,7 +59,7 @@ pullStats <- function(){
     cat("\nlast 5 entries: \n\n");print(tail(ds %>% arrange(EntryPublished),n=5))
   cat(paste("\n ->",dim(ds)[1]," rows, ",dim(ds)[2]," variables | avg. = ",
             round(mean(as.data.frame(as.data.frame(table(ds$the_day))[2])$Freq),2), " per day\n",
-            "-> date range: ", min(ds$theday), "-", max(ds$theday)),"\n\n")
+            "-> date range: ", min(ds$the_day), "-", max(ds$the_day)),"\n\n")
   assign("top_outlets",top_outlets,envir = .GlobalEnv)
   select(ds[which(grepl(k,ds$pullURL)),],region) %>% table() -> total
   return(rbind(ds[which(grepl(k,ds$pullURL)),] %>% select(pullURL,region) %>% table(),total))
