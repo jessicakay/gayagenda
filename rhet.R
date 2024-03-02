@@ -70,8 +70,12 @@ datapool %>%
 
 
 datapool %>%
+  filter(mnth==6) %>%
   select(EntryURL, pullURL) %>%
-  distinct(EntryURL) %>% as_tibble()
+  ungroup() %>%
+  distinct(EntryURL) %>% View()
+  
+
 
 # datapool %>%
 #  filter(pullURL=="www.dailysignal.com/") %>% 

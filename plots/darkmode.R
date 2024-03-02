@@ -41,7 +41,7 @@ grid.arrange(
     filter(region!="all regions") %>%
     ggplot()+
     geom_line(aes(x=the_day,y=ct,color=topic, colour="daily"),alpha = 0.1,position="dodge")+
-    geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",size=ct,alpha = 0.05))+
+    geom_point(aes(x=the_day,y=ct,color=topic, colour="daily",alpha = 0.05))+
     labs(title = "Key topics in article excerpt, stratified by search term & region",
          subtitle = "color indicates most frequently discussed topic",
          caption=paste("updated",Sys.time()))+

@@ -13,7 +13,7 @@ ds %>%
   filter(region!="UK") %>%
   group_by(the_day,region,keyword) %>% 
   mutate(ct=n()) %>% 
-  ggplot(aes(the_day,ct,color=region))+
+  ggplot(aes(the_day,ct,color=keyword))+
   geom_point()+
   theme_void()+
   theme(
@@ -80,7 +80,12 @@ ds %>%
        subtitle = "jessk.org/blog",
        caption=paste("updated",Sys.time()," | @jessdkant.bsky.soc"))+
   facet_grid(.~keyword)
-
+ds %>% filter(region=="all regions")%>%  
+         filter(keyword=="transgender")%>%
+        mutate(mnth=lubridate::month(the_day)) %>% 
+        mutate(yr=lubridate::year(the_day)) %>%
+    mutate(year=year(the_day)) %>% 
+    group_by(the_day,region,keyword) %>% mutate(ct=n()) %>%
 
 View(ds[(ds$region=="UK"),])
 
@@ -89,16 +94,15 @@ View(ds[(ds$region=="UK"),])
 
 datapool %>%  
   ggplot()+
-  geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.01)+
+  geom_point(aes(x=the_day,y=ct,color=keyword),alpha=0.1)+
   geom_line(aes(x=the_day,y=ct,color=keyword),alpha=0.1)+
-  geom_smooth(aes(x=the_day,y=ct,color=keyword),se=FALSE)+
   labs(title = "frequency of news articles in Google News",
        subtitle = "All regions, by quarter")+
   xlab(element_blank())+
   ylab("number of articles")+
-  theme_light()+
-  theme(legend.position = "none")+
+  theme_minimal()+
+  theme(legend.position = "bottom")+
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_blank())+
-  scale_color_brewer(palette = "Set1") +
-  facet_grid(.~my,scales = "free_x") 
+  scale_color_brewer(palette = "Paired") +
+  facet_grid(keyword~my,scales = "free") 
