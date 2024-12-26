@@ -18,6 +18,7 @@
    headers   <- as.data.frame(cbind(headers))
    # googlesheets4::sheet_append(tsheetall,as.vector(headers),sheet =1) # inserts headers into blank sheet, only run first time
 
+   # googledrive::drive_deauth() 
 
 refresh<-function(arg="all"){
   if(arg=="pull" | arg=="all"){
