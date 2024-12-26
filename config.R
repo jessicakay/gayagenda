@@ -23,7 +23,8 @@ c("ggplot2",
       paste(libs[which(as.vector(libs %in% as.data.frame(installed.packages())$Package) == TRUE)]," already installed\n"),
       "\n",libs[which(as.vector(libs %in% as.data.frame(installed.packages())$Package) == FALSE)]," not found")
   
-    install.packages(libs[which(as.vector(c(libs) %in% as.data.frame(installed.packages())$Package) == FALSE)])
+    install.packages(
+      libs[which(as.vector(c(libs) %in% as.data.frame(installed.packages())$Package) == FALSE)])
 
 # load all packages
     

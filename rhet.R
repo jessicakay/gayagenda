@@ -6,10 +6,10 @@ refresh("ex")
 read.csv("/Users/jessa/Downloads/merged_news_feb22024.csv") -> nds
 read.csv("/Users/jessa/OneDrive/Documents/GitHub/misc/gayagenda/datasets/negativevalencekws.csv") -> exds_cleaned
 
-# exds[(exds$keyword!="woke ideology"),][c(-8)] -> exds_cleaned
+ exds[(exds$keyword!="woke ideology"),][c(-8)] -> exds_cleaned
 
 
-nds %>% 
+ds %>% 
   filter(region=="all regions") %>%
   select(names(exds_cleaned)) -> set1
   
@@ -89,7 +89,7 @@ dp %>%
   ungroup() %>%
   distinct(EntryURL,.keep_all = T)->dp
 
-write.csv(table(dp$mnth,dp$pullURL),"clipboard")
+write.csv(table(dp$my,dp$pullURL),"clipboard")
 
 
 #    select(mnth,keyword) %>%
