@@ -1,3 +1,14 @@
+## analysis
+
+* 2/3/2024
+[Anatomy of a moral panic](https://jessk.org/blog/anatomy-of-a-moral-panic)
+
+* 2/15/2024
+[Hate in a post-information age](https://jessk.org/blog/hate-in-a-post-information-age)
+
+* 1/4/2025
+[disinformation in the age of generative AI](https://jessk.org/blog/ai-and-disinformation)
+
 # gayagenda
 
 
@@ -9,16 +20,6 @@ Hope you like it.
 
 _Jess_
 
-## analysis
-
-* 2/3/2024
-[Anatomy of a moral panic](https://jessk.org/blog/anatomy-of-a-moral-panic)
-
-* 2/15/2024
-[Hate in a post-information age](https://jessk.org/blog/hate-in-a-post-information-age)
-
-* 1/4/2025
-[disinformation in the age of generative AI](https://jessk.org/blog/ai-and-disinformation)
 
 ### Follow its progress on Mastodon/Bluesky:
 
