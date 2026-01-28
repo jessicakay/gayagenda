@@ -22,9 +22,9 @@ _Jess_
 
 ### Follow its progress on Mastodon/Bluesky:
 
-    _[tech.lgbt/@jessdkant](https://tech.lgbt/@jessdkant)_
+    [tech.lgbt/@jessdkant](https://tech.lgbt/@jessdkant)
 
-    _[jessdkant.bsky.social](https://bsky.app/profile/jessdkant.bsky.social)_
+    [jessdkant.bsky.social](https://bsky.app/profile/jessdkant.bsky.social)
 
 ### updates
 
