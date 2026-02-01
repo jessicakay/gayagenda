@@ -3,6 +3,7 @@
 
 { library(ggplot2)
   library(dplyr)
+  library(stringr)
   library(lubridate)
   library(paletteer)
   library(gridExtra)} 
@@ -37,7 +38,7 @@ mega_ds %>%
   mutate(year = year(lubridate::as_date(the_day))) %>%
   mutate(quarter = quarter(lubridate::as_date(the_day))) -> mega_ds
 
-# start scratchpad
+# start outlet comparison bar plots
 
 {
   mega_ds %>%
@@ -121,8 +122,45 @@ mega_ds %>%
           strip.text= element_text(colour="black"),
           strip.background = element_rect(fill="purple")) -> d
 
-}
+    # build plots
+    gridExtra::grid.arrange(a,c,widths=c(4,5.5))         -> cnn_to_foxnews
+    gridExtra::grid.arrange(a,b,c,widths=c(4,4,5))       -> cnn_to_nyt_to_Fox
+    gridExtra::grid.arrange(a,b,d,c,widths=c(4,4,4,5.5)) -> cnn_nyt_advocate_fox
+  
+  }
 
-  gridExtra::grid.arrange(a,c,widths=c(4,5.5))         -> cnn_to_foxnews
-  gridExtra::grid.arrange(a,b,c,widths=c(4,4,5))       -> cnn_to_nyt_to_Fox
-  gridExtra::grid.arrange(a,b,d,c,widths=c(4,4,4,5.5)) -> cnn_nyt_advocate_fox
+    
+     # data cleaning
+     mega_ds[which(mega_ds$keyword != "transgenderism"),] -> mega_ds
+     mega_ds[which(mega_ds$keyword!="gender confusion"),] -> mega_ds
+     mega_ds[which(mega_ds$year!="2026"),] -> mega_ds
+     
+   
+   ds %>% 
+     distinct(EntryURL, .keep_all = TRUE) %>%
+     mutate(month=month(lubridate::as_date(the_day))) %>% 
+     mutate(year = year(lubridate::as_date(the_day))) %>% 
+     group_by(year,month,keyword) %>%
+     arrange(desc(the_day)) %>%
+     summarise(n=n()) %>% 
+    filter(year!="2026") %>%
+    filter(pullURL=="www.cnn.com/") %>%
+    ggplot()+
+    geom_line(aes(x=quarter,fill=keyword),position = position_dodge(preserve = "single"))+
+    facet_grid(year~quarter,scales = "free_x")+
+    scale_fill_paletteer_d("yarrr::cars")+
+    scale_x_discrete(drop=F)+scale_y_discrete(drop=F)+
+    theme_dark()+
+    ylab(label = "jessica kant")+
+    xlab(label = " ")+
+    labs(title = "cnn.com")+
+    theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+          panel.background = element_rect("black"),legend.background = element_rect("black"),
+          legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+          text = element_text(colour = "white"),
+          legend.position = "none") -> e
+
+#  position = position_dodge(preserve = "single"))+
+
+
+  
