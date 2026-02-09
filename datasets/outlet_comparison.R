@@ -23,7 +23,33 @@ refresh()
     #  mutate(quarter = quarter(lubridate::as_date(the_day))) -> ds
     #  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> ds$pullURL
 
-ds %>% 
+    # exds %>% 
+    #  mutate(the_day=as.Date(mdy(str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) -> exds
+    #  substring(str_extract(exds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> exds$pullURL
+
+
+  # newest merge and clean code
+
+  exds[which(exds$keyword!="woke ideology"),] -> exds
+  ds <- subset(ds, select=c(-theday, -X, -topic))
+  ds <- subset(ds, select=c(-pullURL))
+  exds <- subset(exds,select = c(-X))
+  exds[names(exds)[1:11]] -> exds
+  exds <- subset(exds, select=c(-pullURL))
+
+  # if using refresh(arg="ex")
+  select(exds,c(names(ds))) -> exds
+
+union(ds,exds) -> mega_ds
+
+# mega_ds %>% 
+# filter(keyword!="woke ideology") %>%
+#  mutate(month=month(lubridate::as_date(the_day))) %>% 
+#  mutate(year = year(lubridate::as_date(the_day))) %>%
+#  mutate(quarter = quarter(lubridate::as_date(the_day))) -> mega_ds
+
+
+mega_ds %>% 
   mutate(the_day=as.Date(mdy(str_extract(
     EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
   mutate(month=month(lubridate::as_date(the_day))) %>% 
@@ -35,22 +61,7 @@ ds %>%
                str_extract(
                  str_remove(EntryURL,"www."),
                  pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
-               "http?s:\\/\\/"),"/")) -> ds
-
-  ds <- subset(ds, select=c(-theday, -X, -topic))
-  exds <- subset(exds,select = c(-X))
-
-exds %>% 
-  mutate(the_day=as.Date(mdy(str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) -> exds
-  substring(str_extract(exds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> exds$pullURL
-
-union(ds,exds) -> mega_ds
-  
-mega_ds %>% 
-  filter(keyword!="woke ideology") %>%
-  mutate(month=month(lubridate::as_date(the_day))) %>% 
-  mutate(year = year(lubridate::as_date(the_day))) %>%
-  mutate(quarter = quarter(lubridate::as_date(the_day))) -> mega_ds
+               "http?s:\\/\\/"),"/")) -> mega_ds
 
     # start outlet comparison bar plots
 
@@ -367,32 +378,90 @@ cust_pal <- c("#F6F0D4FF")
            legend.position = "bottom") 
 
    
-   
-   ds %>% 
+  mega_ds 
      filter(year!="2026") %>%
      filter(pullURL %in% top10uk) %>%
      filter(region=="all regions") %>%
      distinct(EntryURL, .keep_all = TRUE) %>%
-     group_by(quarter,year,keyword,pullURL) %>%
+     group_by(month,year,keyword,pullURL) %>%
      mutate(ct=n()) %>%
      ungroup()%>%
-     group_by(quarter,year,pullURL) %>%
+     group_by(month,year,pullURL) %>%
      mutate(maxkw=max(ct)) %>%
      mutate(topkw=case_when(
                 ct==maxkw ~ 1,
                 ct!=maxkw ~ 0.2)) %>% 
      ungroup() %>%
    ggplot()+
-     geom_line(aes(x=quarter,
+     geom_line(aes(x=month,
                    y=ct,
                    alpha=topkw,
                    color=keyword,
                    group=interaction(keyword,year)))+
-     scale_alpha_identity()+
-     geom_point(aes(x=quarter,
+     geom_point(aes(x=month,
                     y=ct,
                     alpha=topkw,
-                    color=keyword))+
+                    color=keyword,
+                    group=interaction(keyword,year)))+
+     scale_alpha_identity()+
+     facet_grid(year~pullURL)+
+     ylab(label = "jessica kant")+
+     scale_color_paletteer_d("yarrr::info")+
+     theme_dark()+
+     labs(title = "\nArticles added to index by search term in Google News search results\n
+          top 10 outlets\tregion: \"all\"\n",
+          subtitle = "jessk.org/blog")+
+     theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+           panel.background = element_rect("black"),legend.background = element_rect("black"),
+           legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+           text = element_text(colour = "white"),
+           legend.position = "bottom")
+   
+   
+   
+   mega_ds %>% 
+     mutate(the_day=as.Date(mdy(str_extract(
+       EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
+     mutate(month=month(lubridate::as_date(the_day))) %>% 
+     mutate(year = year(lubridate::as_date(the_day))) %>%
+     mutate(quarter = quarter(lubridate::as_date(the_day))) %>%
+     mutate(pullURL=
+              str_remove(
+                str_remove(
+                  str_extract(
+                    str_remove(EntryURL,"www."),
+                    pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
+                  "http?s:\\/\\/"),"/")) -> mega_ds
+   
+   
+   
+   
+   
+   mega_ds %>% 
+     filter(year!="2026") %>%
+     filter(pullURL %in% top10uk) %>%
+     filter(region=="all regions") %>%
+     distinct(EntryURL, .keep_all = TRUE) %>%
+     group_by(month,year,keyword,pullURL) %>%
+     mutate(ct=n()) %>%
+     ungroup()%>%
+     group_by(month,year,pullURL) %>%
+     mutate(maxkw=max(ct)) %>%
+     mutate(topkw=case_when(
+                ct==maxkw ~ 1,
+                ct!=maxkw ~ 0.2)) %>% 
+     ungroup() %>%
+   ggplot()+
+     geom_line(aes(x=month,
+                   y=ct,
+                   alpha=topkw,
+                   color=keyword,
+                   group=interaction(keyword,year)))+
+     geom_point(aes(x=month,
+                    y=ct,
+                    alpha=topkw,
+                    color=keyword,
+                    group=interaction(keyword,year)))+
      scale_alpha_identity()+
      facet_grid(year~pullURL)+
      ylab(label = "jessica kant")+
