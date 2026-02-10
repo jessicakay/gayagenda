@@ -1,4 +1,4 @@
-# fixed TLD grabber
+# load using this, jan 2026
 # jessdkant.bsky.social
 
 { library(ggplot2)
@@ -22,6 +22,33 @@
   # if using refresh(arg="ex"): select(exds,c(names(ds))) -> exds
   union(ds,exds) -> mega_ds
   names(mega_ds)
+  
+  mega_ds %>%
+    mutate(the_day=as.Date(mdy(str_extract(
+      EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
+    mutate(month=month(lubridate::as_date(the_day))) %>%
+    mutate(dayweek=weekdays(the_day)) %>%
+    # mutate(myear=my(lubridate::as_date(the_day)))
+    mutate(year = year(lubridate::as_date(the_day))) %>%
+    mutate(quarter = quarter(lubridate::as_date(the_day))) %>%
+    mutate(pullURL=
+             str_remove(
+               str_remove(
+                 str_extract(
+                   str_remove(EntryURL,"www."),
+                   pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
+                 "http?s:\\/\\/"),"/")) -> mega_ds
+  
+  # data cleaning
+  mega_ds[which(mega_ds$keyword != "transgenderism"),] -> mega_ds
+  mega_ds[which(mega_ds$keyword!="gender confusion"),] -> mega_ds
+  mega_ds[which(mega_ds$year!="2026"),] -> mega_ds
+  
+  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"yahoo"))] <- "yahoo.com"
+  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"twitter.com"))] <- "x.com"
+  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"thetimes.com"))] <- "thetimes.co.uk"
+  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"bbc.com"))] <- "bbc.co.uk"
+
 
   { c("dailysignal.com",
     "christanpost.com",
@@ -37,30 +64,3 @@
       "instagram.com",
       "substack",
       "facebook.com") ->socials }
-  
-mega_ds %>%
-  mutate(the_day=as.Date(mdy(str_extract(
-    EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
-  mutate(month=month(lubridate::as_date(the_day))) %>%
-  mutate(dayweek=weekdays(the_day)) %>%
-  # mutate(myear=my(lubridate::as_date(the_day)))
-  mutate(year = year(lubridate::as_date(the_day))) %>%
-  mutate(quarter = quarter(lubridate::as_date(the_day))) %>%
-  mutate(pullURL=
-           str_remove(
-             str_remove(
-               str_extract(
-                 str_remove(EntryURL,"www."),
-                 pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
-               "http?s:\\/\\/"),"/")) -> mega_ds
-  
-  # data cleaning
-  mega_ds[which(mega_ds$keyword != "transgenderism"),] -> mega_ds
-  mega_ds[which(mega_ds$keyword!="gender confusion"),] -> mega_ds
-  mega_ds[which(mega_ds$year!="2026"),] -> mega_ds
-  
-  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"yahoo"))] <- "yahoo.com"
-  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"twitter.com"))] <- "x.com"
-  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"thetimes.com"))] <- "thetimes.co.uk"
-  mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"bbc.com"))] <- "bbc.co.uk"
-
