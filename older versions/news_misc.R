@@ -61,6 +61,12 @@ kw+theme_dark()+
   scale_color_brewer(palette = "Reds")
 
 
+#  ds[which(ds$pullURL=="news.yahoo.com"),]      -> y_a ; dim(a)
+#  ds[which(ds$pullURL=="yahoo.com"),]           -> y_b ; dim(b)
+#  ds[which(ds$pullURL=="uk.yahoo.com"),]        -> y_c ; dim(c)
+#  ds[which(ds$pullURL=="uk.news.yahoo.com"),]   -> y_d ; dim(d)
+#  ds[which(ds$pullURL=="sports.yahoo.com"),]    -> y_e ; dim(e)
+#  dim(y_a)[1]+ dim(y_b)[1]+ dim(y_c)[1]+dim(y_d)[1]+dim(y_e)[1]
 
 
 
@@ -110,3 +116,8 @@ ds %>% group_by(pullURL,keyword) %>%
 
 ds[which(str_detect(ds$EntryURL,pattern = "dailywire") & ds$region == "USA"),] %>% select(EntryPublished,EntryTitle,keyword) %>% arrange(keyword)
 
+
+
+# exds_export -> exds
+# write.csv(exds_export,"~/gayagenda/datasets/ex_kws.csv")
+# exds %>% group_by(keyword,quarter,year) %>% arrange(desc(year)) %>% summarise(n=n()) -> summed
