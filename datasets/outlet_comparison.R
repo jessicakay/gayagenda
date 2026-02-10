@@ -53,6 +53,8 @@ mega_ds %>%
   mutate(the_day=as.Date(mdy(str_extract(
     EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
   mutate(month=month(lubridate::as_date(the_day))) %>% 
+  mutate(dayweek=weekdays(the_day)) %>%
+  # mutate(myear=my(lubridate::as_date(the_day)))
   mutate(year = year(lubridate::as_date(the_day))) %>%
   mutate(quarter = quarter(lubridate::as_date(the_day))) %>%
   mutate(pullURL=
@@ -63,95 +65,6 @@ mega_ds %>%
                  pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
                "http?s:\\/\\/"),"/")) -> mega_ds
 
-    # start outlet comparison bar plots
-
-  {
-    mega_ds %>%
-      filter(year!="2026") %>%
-      filter(keyword!="gender confusion") %>%
-      filter(pullURL=="www.cnn.com/") %>%
-      ggplot()+
-    geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+
-      facet_grid(.~year)+
-      scale_fill_paletteer_d("yarrr::cars")+
-      theme_dark()+
-      ylab(label = "jessica kant")+
-      xlab(label = " ")+
-      labs(title = "cnn.com")+
-      coord_cartesian(ylim = c(0,300))+
-      theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
-            panel.background = element_rect("black"),legend.background = element_rect("black"),
-            legend.box.background = element_rect("black"),legend.key = element_rect("black"),
-            text = element_text(colour = "white"),
-            legend.position = "none") -> a
-    
-    mega_ds %>%
-    #  filter(pullURL %in% six_sources) %>%
-      filter(pullURL=="www.foxnews.com/") %>%
-      filter(keyword!="gender confusion") %>%
-      filter(year!="2026") %>%
-      ggplot()+
-      geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+
-      facet_grid(.~year)+
-      scale_fill_paletteer_d("yarrr::cars")+
-      theme_dark()+
-      labs(title = "foxnews.com")+
-      xlab(label = "")+
-      ylab(label = "")+
-      coord_cartesian(ylim = c(0,300))+
-      theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
-            panel.background = element_rect("black"), legend.background = element_rect("black"),
-            legend.box.background = element_rect("black"),legend.key = element_rect("black"),
-            text = element_text(colour = "white"),
-            legend.position = "right") -> c
-    
-    mega_ds %>%
-      #  filter(pullURL %in% six_sources) %>%
-      filter(pullURL=="www.nytimes.com/") %>%
-      filter(keyword!="gender confusion") %>%
-      filter(year!="2026") %>%
-      ggplot()+
-      geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+
-      facet_grid(.~year)+
-      scale_fill_paletteer_d("yarrr::cars")+
-      theme_dark()+
-      labs(title = "nytimes.com")+
-      xlab(label = "")+
-      ylab(label = "")+
-      coord_cartesian(ylim = c(0,300))+
-      theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
-            panel.background = element_rect("black"), legend.background = element_rect("black"),
-            legend.box.background = element_rect("black"),legend.key = element_rect("black"),
-            text = element_text(colour = "white"),
-            legend.position = "none") -> b
-    
-    mega_ds %>%
-      filter(year!="2026") %>%
-      filter(keyword!="gender confusion") %>%
-      filter(pullURL=="www.advocate.com/") %>%
-      ggplot()+
-      geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+
-      facet_grid(.~year)+
-      scale_fill_paletteer_d("yarrr::cars")+
-      theme_dark()+
-      ylab(label = "")+
-      xlab(label = "jessk.org/blog")+
-      labs(title = "advocate.com")+
-      coord_cartesian(ylim = c(0,300))+
-      theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
-            panel.background = element_rect("black"),legend.background = element_rect("black"),
-            legend.box.background = element_rect("black"),legend.key = element_rect("black"),
-            text = element_text(colour = "hotpink"),
-            legend.position = "none",
-            strip.text= element_text(colour="black"),
-            strip.background = element_rect(fill="purple")) -> d
-  
-      # build plots
-      gridExtra::grid.arrange(a,c,widths=c(4,5.5))         -> cnn_to_foxnews
-      gridExtra::grid.arrange(a,b,c,widths=c(4,4,5))       -> cnn_to_nyt_to_Fox
-      gridExtra::grid.arrange(a,b,d,c,widths=c(4,4,4,5.5)) -> cnn_nyt_advocate_fox
-      
-    }
     
      # data cleaning
      mega_ds[which(mega_ds$keyword != "transgenderism"),] -> mega_ds
@@ -159,10 +72,10 @@ mega_ds %>%
      mega_ds[which(mega_ds$year!="2026"),] -> mega_ds
    
      
-     ds$pullURL[which(str_detect(ds$EntryURL,"yahoo"))] <- "yahoo.com"
-     ds$pullURL[which(str_detect(ds$EntryURL,"twitter.com"))] <- "x.com"
-     ds$pullURL[which(str_detect(ds$EntryURL,"thetimes.com"))] <- "thetimes.co.uk"
-     ds$pullURL[which(str_detect(ds$EntryURL,"bbc.com"))] <- "bbc.co.uk"
+     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"yahoo"))] <- "yahoo.com"
+     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"twitter.com"))] <- "x.com"
+     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"thetimes.com"))] <- "thetimes.co.uk"
+     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"bbc.com"))] <- "bbc.co.uk"
      
      #    mutate(month=month(lubridate::as_date(the_day))) %>% 
      #    mutate(year = year(lubridate::as_date(the_day))) %>% 
@@ -171,6 +84,79 @@ mega_ds %>%
      #    scale_color_paletteer_d("trekcolors::lcars_nx01")+
      #    scale_x_discrete(drop=F)+scale_y_discrete(drop=F)+
 
+     
+     
+     # start outlet comparison bar plots
+     
+     {
+       
+       mega_ds %>% filter(keyword!="gender confusion") %>% filter(year!="2026") -> mega_ds
+
+       #  filter(pullURL %in% six_sources) %>%
+       
+       mega_ds %>%
+         filter(pullURL=="www.cnn.com/") %>%
+         ggplot()+
+         geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+
+         facet_grid(.~year)+
+         scale_fill_paletteer_d("yarrr::cars")+
+         theme_dark()+
+         ylab(label = "jessica kant")+xlab(label = " ")+
+         labs(title = "cnn.com")+
+         coord_cartesian(ylim = c(0,300))+
+         theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+               panel.background = element_rect("black"),legend.background = element_rect("black"),
+               legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+               text = element_text(colour = "white"),
+               legend.position = "none") -> a
+       
+       mega_ds %>%
+         filter(pullURL=="www.foxnews.com/") %>%
+         ggplot()+
+         geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+
+         facet_grid(.~year)+scale_fill_paletteer_d("yarrr::cars")+theme_dark()+
+         labs(title = "foxnews.com")+xlab(label = "")+ylab(label = "")+
+         coord_cartesian(ylim = c(0,300))+
+         theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+               panel.background = element_rect("black"), legend.background = element_rect("black"),
+               legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+               text = element_text(colour = "white"),
+               legend.position = "right") -> c
+       
+       mega_ds %>%
+         filter(pullURL=="www.nytimes.com/") %>%
+         ggplot()+
+         geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+
+         facet_grid(.~year)+
+         scale_fill_paletteer_d("yarrr::cars")+theme_dark()+
+         labs(title = "nytimes.com")+xlab(label = "")+ylab(label = "")+
+         coord_cartesian(ylim = c(0,300))+
+         theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+               panel.background = element_rect("black"), legend.background = element_rect("black"),
+               legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+               text = element_text(colour = "white"),
+               legend.position = "none") -> b
+       
+       mega_ds %>%
+         filter(pullURL=="www.advocate.com/") %>%
+         ggplot()+
+         geom_bar(aes(x=quarter,fill=keyword),position = position_dodge())+facet_grid(.~year)+
+         scale_fill_paletteer_d("yarrr::cars")+theme_dark()+
+         ylab(label = "")+xlab(label = "jessk.org/blog")+
+         labs(title = "advocate.com")+
+         coord_cartesian(ylim = c(0,300))+
+         theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
+               panel.background = element_rect("black"),legend.background = element_rect("black"),
+               legend.box.background = element_rect("black"),legend.key = element_rect("black"),
+               text = element_text(colour = "hotpink"), legend.position = "none", strip.text= element_text(colour="black"),
+               strip.background = element_rect(fill="purple")) -> d
+     }
+     
+    # build plots
+      gridExtra::grid.arrange(a,c,widths=c(4,5.5))         -> cnn_to_foxnews
+      gridExtra::grid.arrange(a,b,c,widths=c(4,4,5))       -> cnn_to_nyt_to_Fox
+      gridExtra::grid.arrange(a,b,d,c,widths=c(4,4,4,5.5)) -> cnn_nyt_advocate_fox
+     
    # youtube
    {
      ds %>% 
@@ -237,30 +223,26 @@ mega_ds %>%
    
    # top 10 / top 20
    
-     
 gettop <- function(){
    ds %>% filter(is.na(pullURL)==FALSE) %>%
-     filter(!(pullURL %in% portals)) %>%
-     filter(!(pullURL %in% socials)) %>%
-     filter(!str_detect(pullURL,".co.uk|uk")) %>% 
+     filter(!(pullURL %in% portals)) %>% filter(!(pullURL %in% socials)) %>% filter(!str_detect(pullURL,".co.uk|uk")) %>% 
      distinct(EntryURL, .keep_all = TRUE) %>% group_by(pullURL) %>% summarize(n=n()) %>% 
      arrange(by_group=desc(n)) %>% head(n=10) %>% select(pullURL) -> top_10_us
    as.vector(top_10_us$pullURL) -> top10us
    # as.list(top_10_us$pullURL) -> top_ten_us
    
    ds %>% filter(is.na(pullURL)==FALSE) %>%
-     filter(!(pullURL %in% portals)) %>%
-     filter(!(pullURL %in% socials)) %>%
-     filter(str_detect(pullURL,".co.uk")) %>%
+     filter(!(pullURL %in% portals)) %>%filter(!(pullURL %in% socials)) %>%filter(str_detect(pullURL,".co.uk")) %>%
    distinct(EntryURL, .keep_all = TRUE) %>% group_by(pullURL) %>% summarize(n=n()) %>% 
      arrange(by_group=desc(n)) %>% head(n=10) %>% select(pullURL) -> top_10_uk
    as.vector(top_10_uk$pullURL) -> top10uk
    #as.list(top_10_uk$pullURL) -> top_ten_uk
   }
 
+#png(filename = '~/gayagenda/plots/top_ten__uk_trans_keyword.png', width= 800, height=500,)
+#dev.off()
 
 cust_pal <- c("#F6F0D4FF")
-#png(filename = '~/gayagenda/plots/top_ten__uk_trans_keyword.png', width= 800, height=500,)
 
 {
    ds %>% 
@@ -288,7 +270,6 @@ cust_pal <- c("#F6F0D4FF")
              text = element_text(colour = "white"),
              legend.position = "bottom") 
 
-#dev.off()
 }
 
    {
@@ -378,64 +359,19 @@ cust_pal <- c("#F6F0D4FF")
            legend.position = "bottom") 
 
    
-  mega_ds 
-     filter(year!="2026") %>%
-     filter(pullURL %in% top10uk) %>%
-     filter(region=="all regions") %>%
-     distinct(EntryURL, .keep_all = TRUE) %>%
-     group_by(month,year,keyword,pullURL) %>%
-     mutate(ct=n()) %>%
-     ungroup()%>%
-     group_by(month,year,pullURL) %>%
-     mutate(maxkw=max(ct)) %>%
-     mutate(topkw=case_when(
-                ct==maxkw ~ 1,
-                ct!=maxkw ~ 0.2)) %>% 
-     ungroup() %>%
-   ggplot()+
-     geom_line(aes(x=month,
-                   y=ct,
-                   alpha=topkw,
-                   color=keyword,
-                   group=interaction(keyword,year)))+
-     geom_point(aes(x=month,
-                    y=ct,
-                    alpha=topkw,
-                    color=keyword,
-                    group=interaction(keyword,year)))+
-     scale_alpha_identity()+
-     facet_grid(year~pullURL)+
-     ylab(label = "jessica kant")+
-     scale_color_paletteer_d("yarrr::info")+
-     theme_dark()+
-     labs(title = "\nArticles added to index by search term in Google News search results\n
-          top 10 outlets\tregion: \"all\"\n",
-          subtitle = "jessk.org/blog")+
-     theme(plot.background=element_rect("black", colour = "black"),panel.grid = element_line("black"),  
-           panel.background = element_rect("black"),legend.background = element_rect("black"),
-           legend.box.background = element_rect("black"),legend.key = element_rect("black"),
-           text = element_text(colour = "white"),
-           legend.position = "bottom")
-   
-   
-   
-   mega_ds %>% 
-     mutate(the_day=as.Date(mdy(str_extract(
-       EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
-     mutate(month=month(lubridate::as_date(the_day))) %>% 
-     mutate(year = year(lubridate::as_date(the_day))) %>%
-     mutate(quarter = quarter(lubridate::as_date(the_day))) %>%
-     mutate(pullURL=
-              str_remove(
-                str_remove(
-                  str_extract(
-                    str_remove(EntryURL,"www."),
-                    pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
-                  "http?s:\\/\\/"),"/")) -> mega_ds
+   ### plot for post 3
    
    
    
    
+     mega_ds %>% filter(is.na(pullURL)==FALSE) %>%
+       filter(!(pullURL %in% portals)) %>%
+       filter(!(pullURL %in% socials)) %>%
+       filter(region!="USA")
+       distinct(EntryURL, .keep_all = TRUE) %>% group_by(pullURL) %>% summarize(n=n()) %>% 
+       arrange(by_group=desc(n)) %>% head(n=5) %>% select(pullURL) -> top_10_us
+     as.vector(top_10_us$pullURL) -> top10all
+     # as.list(top_10_us$pullURL) -> top_ten_us
    
    mega_ds %>% 
      filter(year!="2026") %>%
@@ -475,4 +411,5 @@ cust_pal <- c("#F6F0D4FF")
            legend.box.background = element_rect("black"),legend.key = element_rect("black"),
            text = element_text(colour = "white"),
            legend.position = "bottom")
+   
    
