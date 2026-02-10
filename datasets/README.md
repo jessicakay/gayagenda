@@ -1,6 +1,15 @@
 
 ### dataset updates
 
+January 2026:
+
+* oh boy has it been a long few years. I'm still in the preliminary stages of cleaning the dataset for public consumption, but am making it avaialable in its messy, uncleaned form for the sake of transparency.
+* there are _more_ reliable subsets within the larger 300MB csv, namely the core spreadsheets focused on "all regions"/no regional specifier.
+* using the core three original keywords "transgender" "biological sex" "gender identity" will get the cleanest data
+* these RSS feeds have been uninterrupted as far as I can tell, and have been running continuously and have been inspected/analyzed to death
+* it's important to think about these data in terms of sensitivity and specificity. The collection method is highly sensitive, but as you can see especially with some of the seemingly unrelated article stubs, not as specific as I would like. 
+* higher "quality" sites, meaning those which are professionally done and use sophisticated code to make sure they're indexed properly by search engines, are much more likely to be a "true positive" in epi terms.
+
 February 2024: 
 
 * the first year of data is up! 
