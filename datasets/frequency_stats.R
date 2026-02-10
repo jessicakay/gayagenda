@@ -5,28 +5,23 @@
   library(dplyr)
   library(stringr)
   library(lubridate)
+  library(paletteer)
   library(gridExtra)} 
-
 
 # refresh(arg = "ex")
 
 read.csv("~/gayagenda/datasets/ex_kws.csv") -> exds
 read.csv("~/gayagenda/datasets/Jan2026.csv") -> ds
 
-
 ds <- subset(ds, select=c(-theday, -X, -topic))
 exds <- subset(exds,select = c(-X))
 union(ds,exds) -> mega_ds
-  
 
 # exds_export -> exds 
 # write.csv(exds_export,"~/gayagenda/datasets/ex_kws.csv") 
+# exds %>% group_by(keyword,quarter,year) %>% arrange(desc(year)) %>% summarise(n=n()) -> summed
 
-# exds %>%
-#  group_by(keyword,quarter,year) %>% arrange(desc(year)) %>% summarise(n=n()) -> summed
-
-mega_ds %>%
-  group_by(keyword,quarter,year) %>% arrange(desc(year)) %>% summarise(n=n()) -> summed
+mega_ds %>% group_by(keyword,quarter,year) %>% arrange(desc(year)) %>% summarise(n=n()) -> summed
 
 # install.packages("devtools")
 # install.packages("paletteer")
@@ -71,6 +66,4 @@ ds %>% filter(is.na(pullURL)==FALSE) %>%
    summarize(n=n()) %>% 
    arrange(by_group=desc(n)) %>%
    head(n=20) %>% select(pullURL) -> top_20
-
-
 
