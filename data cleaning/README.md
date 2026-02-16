@@ -12,6 +12,7 @@ A couple of observations on "noise" in the data:
 
   * to get an idea of how this impacts the data itself:
 
+
         > table(mega_ds$region, mega_ds$keyword,exclude = F)
 
                     biological sex gender confusion gender identity gender ideology transgender transgenderism
@@ -20,16 +21,20 @@ A couple of observations on "noise" in the data:
         USA                  32406                0           55325               0       58137              0
         <NA>                     0             4471               0           46568           0          10746
 
+
   * as you can see, the NA values for $region only appear in the extended dataset ("exds" in the repo).
 
 * the "pull URL" function has been fraught, and there are examples in the various scripts of manually recoding specific sites which have variations that are best seen in aggregate. For example:
 
+
       mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"yahoo"))] <- "yahoo.com"
         mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"twitter.com"))] <- "x.com"
         mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"thetimes.com"))] <- "thetimes.co.uk"
+
         mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"bbc.com"))] <- "bbc.co.uk"
 
 * the best indicator of unique articles is done by looking at "EntryURL", the unsanitized URL passed from the Google Alert RSS feed to IFTTT and saved in a sheet. There are roughly 230k unique URLs in the dataset.
+
 
       [1] 181213      1
       > exds %>% distinct(EntryURL) %>% dim()
@@ -38,7 +43,9 @@ A couple of observations on "noise" in the data:
       [1] 230037      1
       >
 
+
 * this presents some challenges in keyword analysis, however, as can be seen here:
+
 
       > mega_ds %>% select(keyword, region) %>% table(exclude=F)
                         region
@@ -51,7 +58,9 @@ A couple of observations on "noise" in the data:
         transgenderism             0     0     0 10746
       >
 
+
 * compared this to:
+
 
       > mega_ds %>% distinct(EntryURL, .keep_all=T)  %>% select(keyword, region) %>% table(exclude=F)
                         region
