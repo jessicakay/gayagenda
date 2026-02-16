@@ -75,15 +75,18 @@ A couple of observations on "noise" in the data:
 * overlapping entries are surprisingly not a huge part of the data. As can be seen by the 230k unique URLs above (compared to 380k observations )
 * to check for yourself, the following will show you the raw counts and proportions
 
-      > mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only ; table(ds_only) ; round(prop.table(table(ds_only)),2)
-      > mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only ; table(ds_only) ; round(prop.table(table(ds_only)),2)
+      mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only
+      table(ds_only) ; round(prop.table(table(ds_only)),2)
+      mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only
+      table(ds_only) ; round(prop.table(table(ds_only)),2)
 
-      Should yield:
 
-      biological sex gender identity     transgender
-            34782           50510           52954
-            0.25            0.37            0.38
+The above should yield:
 
-      biological sex gender confusion  gender identity  gender ideology      transgender   transgenderism
-            37435             4471            56679            46568            58703            10746
-            0.17             0.02             0.26             0.22             0.27             0.05
+            biological sex gender identity     transgender
+                  34782           50510           52954
+                  0.25            0.37            0.38
+
+            biological sex gender confusion  gender identity  gender ideology      transgender   transgenderism
+                  37435             4471            56679            46568            58703            10746
+                  0.17             0.02             0.26             0.22             0.27             0.05
