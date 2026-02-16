@@ -1,91 +1,6 @@
 # frequency stats
 # jessdkant.bsky.social
 
-{ library(ggplot2)
-  library(dplyr)
-  library(stringr)
-  library(lubridate)
-  library(paletteer)
-  library(gridExtra)} 
-
-# View(cleaned_ds)
-# refresh(arg = "ex")
-
-read.csv("~/gayagenda/datasets/ex_kws.csv") -> exds
-read.csv("~/gayagenda/datasets/Jan2026.csv") -> ds
-
-refresh()
-
-    # ds %>% 
-    #  mutate(the_day=as.Date(mdy(str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
-    #  mutate(month=month(lubridate::as_date(the_day))) %>% 
-    #  mutate(year = year(lubridate::as_date(the_day))) %>%
-    #  mutate(quarter = quarter(lubridate::as_date(the_day))) -> ds
-    #  substring(str_extract(ds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> ds$pullURL
-
-    # exds %>% 
-    #  mutate(the_day=as.Date(mdy(str_extract(EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) -> exds
-    #  substring(str_extract(exds$EntryURL, pattern="https:\\/\\/?[a-z]+.[a-zA-Z0-9]+?.?[a-z]+/"), first=9) -> exds$pullURL
-
-
-  # newest merge and clean code
-
-  exds[which(exds$keyword!="woke ideology"),] -> exds
-  ds <- subset(ds, select=c(-theday, -X, -topic))
-  ds <- subset(ds, select=c(-pullURL))
-  exds <- subset(exds,select = c(-X))
-  exds[names(exds)[1:11]] -> exds
-  exds <- subset(exds, select=c(-pullURL))
-
-  # if using refresh(arg="ex")
-  select(exds,c(names(ds))) -> exds
-
-union(ds,exds) -> mega_ds
-
-# mega_ds %>% 
-# filter(keyword!="woke ideology") %>%
-#  mutate(month=month(lubridate::as_date(the_day))) %>% 
-#  mutate(year = year(lubridate::as_date(the_day))) %>%
-#  mutate(quarter = quarter(lubridate::as_date(the_day))) -> mega_ds
-
-
-mega_ds %>% 
-  mutate(the_day=as.Date(mdy(str_extract(
-    EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
-  mutate(month=month(lubridate::as_date(the_day))) %>% 
-  mutate(dayweek=weekdays(the_day)) %>%
-  # mutate(myear=my(lubridate::as_date(the_day)))
-  mutate(year = year(lubridate::as_date(the_day))) %>%
-  mutate(quarter = quarter(lubridate::as_date(the_day))) %>%
-  mutate(pullURL=
-           str_remove(
-             str_remove(
-               str_extract(
-                 str_remove(EntryURL,"www."),
-                 pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
-               "http?s:\\/\\/"),"/")) -> mega_ds
-
-    
-     # data cleaning
-     mega_ds[which(mega_ds$keyword != "transgenderism"),] -> mega_ds
-     mega_ds[which(mega_ds$keyword!="gender confusion"),] -> mega_ds
-     mega_ds[which(mega_ds$year!="2026"),] -> mega_ds
-   
-     
-     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"yahoo"))] <- "yahoo.com"
-     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"twitter.com"))] <- "x.com"
-     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"thetimes.com"))] <- "thetimes.co.uk"
-     mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"bbc.com"))] <- "bbc.co.uk"
-     
-     #    mutate(month=month(lubridate::as_date(the_day))) %>% 
-     #    mutate(year = year(lubridate::as_date(the_day))) %>% 
-
-     #    position = position_dodge(preserve = "single"))+
-     #    scale_color_paletteer_d("trekcolors::lcars_nx01")+
-     #    scale_x_discrete(drop=F)+scale_y_discrete(drop=F)+
-
-     
-     
      # start outlet comparison bar plots
      
      {
@@ -221,24 +136,6 @@ mega_ds %>%
       "substack",
       "facebook.com") ->socials
    
-   # top 10 / top 20
-   
-gettop <- function(){
-   ds %>% filter(is.na(pullURL)==FALSE) %>%
-     filter(!(pullURL %in% portals)) %>% filter(!(pullURL %in% socials)) %>% filter(!str_detect(pullURL,".co.uk|uk")) %>% 
-     distinct(EntryURL, .keep_all = TRUE) %>% group_by(pullURL) %>% summarize(n=n()) %>% 
-     arrange(by_group=desc(n)) %>% head(n=10) %>% select(pullURL) -> top_10_us
-   as.vector(top_10_us$pullURL) -> top10us
-   # as.list(top_10_us$pullURL) -> top_ten_us
-   
-   ds %>% filter(is.na(pullURL)==FALSE) %>%
-     filter(!(pullURL %in% portals)) %>%filter(!(pullURL %in% socials)) %>%filter(str_detect(pullURL,".co.uk")) %>%
-   distinct(EntryURL, .keep_all = TRUE) %>% group_by(pullURL) %>% summarize(n=n()) %>% 
-     arrange(by_group=desc(n)) %>% head(n=10) %>% select(pullURL) -> top_10_uk
-   as.vector(top_10_uk$pullURL) -> top10uk
-   #as.list(top_10_uk$pullURL) -> top_ten_uk
-  }
-
 #png(filename = '~/gayagenda/plots/top_ten__uk_trans_keyword.png', width= 800, height=500,)
 #dev.off()
 

@@ -31,8 +31,10 @@ gsub("<b>|</b>|&nbsp;|;|&#39;|(|)|\\...|&quo","",paste(ds$EntryContent,ds$EntryT
 as.data.frame(strsplit(x," ")) -> z
 VCorpus(VectorSource(z)) -> zx
 tm_map(zx,removeWords,stopwords(kind = "en")) -> z
-findFreqTerms(term_matrix,lowfreq = 150)
+
 TermDocumentMatrix(Corpus(VectorSource(x))) -> term_matrix
+findFreqTerms(term_matrix,lowfreq = 150)
+
 findAssocs(term_matrix, term="transgender",corlimit = 0.1)
 
 # RSS directly
