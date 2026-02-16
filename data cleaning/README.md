@@ -3,34 +3,16 @@ As I've talked about extensively in the documentation on the site, [here](https:
 A couple of observations on "noise" in the data:
 
 * the data is served initially by Google Alerts, which are themselves always being refined and subject to changes in the platform's algorithm.
-* at times, the settings for some of the alerts have come undone on their own due to errors in the software used to bridge Google -> RSS -> IFTTT.
+
+* at times, the settings for some of the alerts have come undone on their own due to errors in the software used to bridge platforms.
+
 * the regional settings appear to be fairly imperfect, and are at best unreliable.
+
   * for this reason, I restrict the majority of the digging I do in terms of frequency to "all regions" or non-regionally coded data.
 
-When cleaned, data should appear as:
+* the "pull URL" function has been fraught, and there are examples in the various scripts of manually recoding specific sites which have variations that are best seen in aggregate. For example:
 
-    , , year = 2023
-    
-                 keyword
-    region        biological sex gender identity transgender
-      all regions           9910           16048       17186
-      UK                     435             140        3235
-      USA                   8482           15747       16940
-    
-    , , year = 2024
-    
-                 keyword
-    region        biological sex gender identity transgender
-      all regions          11202           19549       19701
-      UK                     657            2630        3328
-      USA                   9487           18985       19645
-    
-    , , year = 2025
-    
-                 keyword
-    region        biological sex gender identity transgender
-      all regions          15408           19888       20510
-      UK                    1992            2424        3946
-      USA                  13609           19430       20296
-    
-    > 
+      mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"yahoo"))] <- "yahoo.com"
+        mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"twitter.com"))] <- "x.com"
+        mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"thetimes.com"))] <- "thetimes.co.uk"
+        mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"bbc.com"))] <- "bbc.co.uk"
