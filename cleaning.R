@@ -36,8 +36,8 @@
                str_remove(
                  str_extract(
                    str_remove(EntryURL,"www."),
-                   pattern="http?s:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
-                 "http?s:\\/\\/"),"/")) -> mega_ds
+                   pattern="https?:\\/\\/[a-z0-9A-Z]+[a-z0-9A-Z.-]+/" ),
+                 "https?:\\/\\/"),"/")) -> mega_ds
   
   # remove unneeded columns
   subset(mega_ds, select=c(-FeedTitle, -FeedURL, -EntryPublished)) -> mega_ds
@@ -72,4 +72,5 @@
  #  mega_ds$region[which(is.na(mega_ds$region))] <- "all regions"
  #  table(mega_ds$region, useNA = "always")
     
- 
+   write.csv(mega_ds, paste(paste("nightly",gsub(pattern = "-", replacement = "_", Sys.Date()),sep="_"),".csv",sep=""))
+   
