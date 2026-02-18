@@ -1,60 +1,54 @@
 # subsets
 
-mega_ds %>% filter(pullURL=="foxnews.com") %>% 
-   distinct(EntryURL, .keep_all = T) %>% 
-  filter(year != "2026") %>%
-  select(the_day,dayweek,month, quarter,year,EntryTitle,EntryURL,keyword,pullURL) %>%
-  mutate(type=case_when
-                   (
-                     str_detect(EntryURL,"/video/") == TRUE ~ "video",
-                     str_detect(EntryURL,"/video/") == FALSE ~ "article"
-                   )) %>% 
-  mutate(cat=gsub("/","",str_extract(EntryURL,pattern="/[a-z-]+/"))) %>% 
-  write.csv("~/gayagenda/datasets/subsets/just_fox.csv",row.names = FALSE)
+# jessdkant.bsky.social
+# tech.lgbt/@jessdkant
 
-top_outlets(mega_ds,100)
+# fox news
 
-mega_ds %>%
-  filter(pullURL %in% topouts) %>%
-  distinct(EntryURL, .keep_all = T) %>% 
-  select(the_day,dayweek,month, quarter,year,EntryTitle,EntryURL,keyword,pullURL) -> top_20
+# pull subset
 
-  top_20 %>% write.csv("~/gayagenda/datasets/subsets/top_20.csv",row.names = FALSE)
-
-  mega_ds %>% filter(year=="2026") %>% 
-    filter(pullURL=="foxnews.com") %>% 
-    distinct(EntryURL, .keep_all = TRUE) %>% 
-    mutate(type=case_when(
-                     str_detect(EntryURL,"/video/") == TRUE ~ "video",
-                     str_detect(EntryURL,"/video/") == FALSE ~ "article"
-                   )) %>% 
-    select(month, year, type, EntryTitle,EntryURL,pullURL,cat)  
-    
   mega_ds %>% filter(pullURL=="foxnews.com") %>% 
-    distinct(EntryURL, .keep_all = T) %>% 
-    filter(year == "2026") %>%
+     distinct(EntryURL, .keep_all = T) %>% 
+    filter(year != "2026") %>%
     select(the_day,dayweek,month, quarter,year,EntryTitle,EntryURL,keyword,pullURL) %>%
     mutate(type=case_when
-           (
-             str_detect(EntryURL,"/video/") == TRUE ~ "video",
-             str_detect(EntryURL,"/video/") == FALSE ~ "article"
-           )) %>% 
-    mutate(cat=gsub("/","",str_extract(EntryURL,pattern="/[a-z-]+/"))) %>%
-    select(month,cat) %>% table()
-           
-search_query_1 = "keywords|otherkeywords"
-mega_ds %>%
-mutate(mention= 
-  case_when(
-    str_detect(EntryContent, pattern=search_query )==TRUE ~ str_extract(EntryContent,search_query)
-  )) -> ds_query
+                     (
+                       str_detect(EntryURL,"/video/") == TRUE ~ "video",
+                       str_detect(EntryURL,"/video/") == FALSE ~ "article"
+                     )) %>% 
+    mutate(cat=gsub("/","",str_extract(EntryURL,pattern="/[a-z-]+/"))) -> just_fox
 
-mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) %>% table()
-mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only 
-table(ds_only) ; round(prop.table(table(ds_only)),2)
-mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only 
-table(ds_only) ; round(prop.table(table(ds_only)),2)
+# create subset CSV
 
+    write.csv(just_fox, "~/gayagenda/datasets/subsets/just_fox.csv",row.names = FALSE)
+
+# top outlets only - top 100
+
+  top_outlets(mega_ds,100)
+
+  mega_ds %>%
+    filter(pullURL %in% topouts) %>%
+    distinct(EntryURL, .keep_all = T) %>% 
+    select(the_day,dayweek,month, quarter,year,EntryTitle,EntryURL,keyword,pullURL) -> top_100
+  
+    top_100 %>% write.csv("~/gayagenda/datasets/subsets/top_20.csv",row.names = FALSE)
+  
+# pull all data with various keywords
+
+    search_query_1 = "keywords|otherkeywords"
+    mega_ds %>%
+    mutate(mention= 
+      case_when(
+        str_detect(EntryContent, pattern=search_query )==TRUE ~ str_extract(EntryContent,search_query)
+      )) -> ds_query
+  
+# tabulate above data
+    
+  mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) %>% table()
+  mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only 
+  table(ds_only) ; round(prop.table(table(ds_only)),2)
+  mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only 
+  table(ds_only) ; round(prop.table(table(ds_only)),2)
 
 # pressreader subset
 
