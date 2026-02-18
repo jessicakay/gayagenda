@@ -42,14 +42,12 @@ mega_ds %>%
     mutate(cat=gsub("/","",str_extract(EntryURL,pattern="/[a-z-]+/"))) %>%
     select(month,cat) %>% table()
            
-search_query_1 = "Dr. Upton|Beth Upton|Dr. Beth Upton|transgender medic|trans* medic"
-search_query_2 = "trans|medic|"
+search_query_1 = "keywords|otherkeywords"
 mega_ds %>%
 mutate(mention= 
   case_when(
     str_detect(EntryContent, pattern=search_query )==TRUE ~ str_extract(EntryContent,search_query)
   )) -> ds_query
-
 
 mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) %>% table()
 mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only 
@@ -101,5 +99,9 @@ pressr %>%
   select(-contains("Entry")) %>% select(-cutvars) -> pressr_unique
 
 pressr_unique %>% select(publication,country) %>% table()
-
 pressr_unique %>% group_by(country) %>% summarize(n=n()) %>% arrange(desc(n))
+
+pressr %>% 
+  select(-contains("Entry")) %>% select(-cutvars) %>% 
+  arrange(country, publication) %>% 
+  write.csv(file = "~/gayagenda/datasets/subsets/pressreader.csv")
