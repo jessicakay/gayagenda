@@ -52,15 +52,30 @@ mutate(mention=
     str_detect(EntryContent, pattern=search_query )==TRUE ~ str_extract(EntryContent,search_query)
   )) -> ds_query
 
-ds_query %>%
-  group_by(mention, pullURL) %>%
-  count(mention,pullURL,.drop =T) 
 
-mega_ds %>%
-  mutate(mention= 
-           case_when(
-             str_detect(EntryContent, pattern=search_query )==TRUE ~ str_extract(EntryContent,search_query)
-           )) %>% 
-  group_by(mention, pullURL) %>%
-  count(mention,pullURL) #
-%>% select(pullURL,mention) %>% prop.table() 
+
+mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) %>% table()
+mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only ; table(ds_only) ; round(prop.table(table(ds_only)),2)
+mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only ; table(ds_only) ; round(prop.table(table(ds_only)),2)
+
+
+# pressreader subset
+
+mega_ds %>% filter(pullURL=="pressreader.com") %>%
+    mutate(url_stub=str_remove(EntryURL,'https?:\\/\\/www.pressreader.com/')) %>%
+    mutate(country=str_extract(url_stub, '[a-z]+')) %>%
+    mutate(publication=str_extract(url_stub,'[a-zA-Z0-9-]+(?=/[0-9]{8})')) %>%
+    mutate(date=str_extract(EntryURL,'(?=[0-9]{8})[0-9]+')) %>%
+    mutate(articleID=str_extract(EntryURL,'[0-9]+(?<=[0-9]{15})')) %>%
+    select(the_day,date,country,articleID,publication) -> pressr
+  
+
+# mutate(new=as.vector(unlist(str_split(url_stub,"/")))[[1]]) %>%
+  
+xh<-pressr$EntryURL[1]
+
+  select(new_string) %>% table()
+
+# pressr$EntryURL[(grepl("uk", pressr$EntryURL)==TRUE)]
+
+     
