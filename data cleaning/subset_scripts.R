@@ -42,8 +42,6 @@ mega_ds %>%
     mutate(cat=gsub("/","",str_extract(EntryURL,pattern="/[a-z-]+/"))) %>%
     select(month,cat) %>% table()
            
-  
- 
 search_query_1 = "Dr. Upton|Beth Upton|Dr. Beth Upton|transgender medic|trans* medic"
 search_query_2 = "trans|medic|"
 mega_ds %>%
@@ -52,12 +50,17 @@ mutate(mention=
     str_detect(EntryContent, pattern=search_query )==TRUE ~ str_extract(EntryContent,search_query)
   )) -> ds_query
 
+
 mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) %>% table()
-mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only ; table(ds_only) ; round(prop.table(table(ds_only)),2)
-mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only ; table(ds_only) ; round(prop.table(table(ds_only)),2)
+mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only 
+table(ds_only) ; round(prop.table(table(ds_only)),2)
+mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only 
+table(ds_only) ; round(prop.table(table(ds_only)),2)
 
 
 # pressreader subset
+
+pressr %>% select(country,keyword) %>% table()
 
 mega_ds %>% filter(pullURL=="pressreader.com") %>%
     mutate(url_stub=str_remove(EntryURL,'https?:\\/\\/www.pressreader.com/')) %>%
@@ -68,9 +71,35 @@ mega_ds %>% filter(pullURL=="pressreader.com") %>%
   
 pressr |> select(the_day, country, EntryURL, pubdate, articleID, publication, region) %>% View()
 
-pressr %>% select(year, publication, country) %>% group_by(year, publication, country) %>% summarise(num=n()) %>% arrange(desc(num)) 
+pressr %>% select(year, publication, country, region) %>% 
+  group_by(year, publication, country, region) %>% summarize(num=n()) %>% 
+  arrange(desc(num), desc(region)) 
+
+pressr %>% filter(region=="all regions") %>%
+  select(year, publication, country, keyword) %>% 
+  group_by(year, publication, country, keyword) %>% summarize(num=n()) %>% 
+  arrange(desc(num), desc(keyword)) -> pressr_allregions
 
 # mutate(new=as.vector(unlist(str_split(url_stub,"/")))[[1]]) %>%
 # pressr$EntryURL[(grepl("uk", pressr$EntryURL)==TRUE)]
 
-     
+pressr_allregions %>% 
+  ggplot()+
+  geom_boxplot(aes(x=num,fill=keyword))
+
+# get all unique IDs independent of region
+
+ c("region", 
+   "keyword", 
+   "dayweek", 
+   "the_day",
+   "month", 
+   "quarter") -> cutvars
+
+pressr %>% 
+  distinct(EntryURL,.keep_all = TRUE) %>%
+  select(-contains("Entry")) %>% select(-cutvars) -> pressr_unique
+
+pressr_unique %>% select(publication,country) %>% table()
+
+pressr_unique %>% group_by(country) %>% summarize(n=n()) %>% arrange(desc(n))
