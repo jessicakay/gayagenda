@@ -44,7 +44,6 @@
   
 # tabulate above data
     
-  mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) %>% table()
   mega_ds %>% filter(region=="all regions") %>% distinct(EntryURL, .keep_all = T) %>% select(keyword) -> ds_only 
   table(ds_only) ; round(prop.table(table(ds_only)),2)
   mega_ds %>% filter(region=="all regions" | is.na(region)) %>% select(keyword) -> ds_only 
@@ -57,7 +56,8 @@ pressr %>% select(country,keyword) %>% table()
 mega_ds %>% filter(pullURL=="pressreader.com") %>%
     mutate(url_stub=str_remove(EntryURL,'https?:\\/\\/www.pressreader.com/')) %>%
     mutate(country=str_extract(url_stub, '[a-z]+')) %>%
-    mutate(publication=gsub(pattern = "-", replacement = " ", str_extract(url_stub,'[a-zA-Z0-9-]+(?=/[0-9]{8})'))) %>%
+    mutate(publication=gsub(pattern = "-", replacement = " ", 
+                            str_extract(url_stub,'[a-zA-Z0-9-]+(?=/[0-9]{8})'))) %>%
     mutate(pubdate=str_extract(EntryURL,'(?=[0-9]{8})[0-9]+')) %>%
     mutate(articleID=str_extract(EntryURL,'[0-9]+(?<=[0-9]{15})')) -> pressr
   
@@ -99,3 +99,21 @@ pressr %>%
   select(-contains("Entry")) %>% select(-cutvars) %>% 
   arrange(country, publication) %>% 
   write.csv(file = "~/gayagenda/datasets/subsets/pressreader.csv")
+
+# substack
+
+mega_ds %>%
+  filter(str_detect(EntryURL,"substack.com")) %>% 
+  mutate(substack=pullURL)%>%
+  mutate(subname= case_when(
+           str_detect(pullURL,"[a-z]+.substack.com")==FALSE  ~ "substack.com",
+           str_detect(pullURL,"[a-z]+.substack.com")==TRUE ~ str_extract(pullURL,"[a-z_]+(?=.substack.com)"))
+         ) %>%  
+  mutate(post_ID = case_when(
+    str_detect(pullURL,"[a-z]+.substack.com") == FALSE  ~ str_remove(str_extract(EntryURL,"post\\/[a-z0-9A-Z-]+"),"post/p-"),
+    str_detect(pullURL,"[a-z]+.substack.com") == TRUE ~ gsub("-"," ",str_remove(str_extract(EntryURL,"\\/p\\/[a-z0-9A-Z-]+"),"/p/")))
+        ) %>% select(the_day,month,year,keyword,EntryTitle,pullURL,subname, post_ID, EntryURL) -> substack
+
+write.csv(substack,
+          paste0(paste("substack_",month(Sys.Date()),year(Sys.Date()),sep="_"),".csv"),
+          row.names = F)
