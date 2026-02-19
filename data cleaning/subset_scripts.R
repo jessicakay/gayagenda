@@ -114,6 +114,24 @@ mega_ds %>%
     str_detect(pullURL,"[a-z]+.substack.com") == TRUE ~ gsub("-"," ",str_remove(str_extract(EntryURL,"\\/p\\/[a-z0-9A-Z-]+"),"/p/")))
         ) %>% select(the_day,month,year,keyword,EntryTitle,pullURL,subname, post_ID, EntryURL) -> substack
 
-write.csv(substack,
-          paste0(paste("substack_",month(Sys.Date()),year(Sys.Date()),sep="_"),".csv"),
+# find potential stacks that are not on substack sub/domains
+
+table(mega_ds$pullURL[which(str_detect(mega_ds$EntryURL,"/p/[a-zA-Z0-9]+") & !str_detect(mega_ds$EntryURL,"substack.com"))])
+
+mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") & 
+                  !str_detect(EntryURL,"substack.com")) %>% select(pullURL,EntryURL) -> possible_subs
+
+possible_subs %>% group_by (pullURL) %>% summarize(n=n()) %>% ungroup() %>% arrange(desc(n))
+
+# write month/year stamped CSV
+
+{getwd() -> curr_dir
+  setwd(dir = "~/gayagenda/datasets/subsets/")
+
+#  "substack*.csv" %in% list.files()
+
+  write.csv(substack,
+          paste0(paste("substack",month(Sys.Date()),year(Sys.Date()),sep="_"),".csv"),
           row.names = F)
+  
+  setwd(curr_dir)}
