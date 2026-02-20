@@ -15,7 +15,7 @@ _related: news and AI_
 [disinformation in the age of generative AI](https://jessk.org/blog/ai-and-disinformation)
 
 * 7/5/2025
-[https://jessk.org/blog/replication-crisis]https://jessk.org/blog/replication-crisis
+[replication crisis](https://jessk.org/blog/replication-crisis)
 
 # gayagenda
 
