@@ -9,13 +9,12 @@
 * 2/8/2026
 [Welcome to the outrage factory](https://jessk.org/blog/architecture-of-an-outrage-factory)
 
+
 _related: news and AI_
 
-* 1/4/2025
-[disinformation in the age of generative AI](https://jessk.org/blog/ai-and-disinformation)
+* [disinformation in the age of generative AI](https://jessk.org/blog/ai-and-disinformation)
 
-* 7/5/2025
-[replication crisis](https://jessk.org/blog/replication-crisis)
+* [replication crisis](https://jessk.org/blog/replication-crisis)
 
 # gayagenda
 
