@@ -6,6 +6,10 @@
 * 2/15/2024
 [Hate in a post-information age](https://jessk.org/blog/hate-in-a-post-information-age)
 
+* 2/8/2026
+[Welcome to the outrage factory](https://jessk.org/blog/architecture-of-an-outrage-factory)
+
+#_the news and AI_
 * 1/4/2025
 [disinformation in the age of generative AI](https://jessk.org/blog/ai-and-disinformation)
 
