@@ -5,7 +5,6 @@
 
 read.csv("~/gayagenda/datasets/nightly_2026_02_16.csv") -> mega_ds
 
-
 # fox news  ----------------------------------------------#
 #
 
@@ -91,6 +90,8 @@ pressr %>%
 mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") & 
                      !str_detect(EntryURL,"substack.com")) %>% select(pullURL,EntryURL) -> possible_subs
 
+  # subscriber pull v2
+
   unique(possible_subs$pullURL) -> site_list
   site_list <- paste0("https://www.",site_list)
   sub_list  <- as.vector(NULL)
@@ -99,47 +100,80 @@ mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") &
   for (i in 1:length(site_list)){
     tryCatch({
       append(sub_list, str_detect(rawToChar(curl::curl_fetch_memory(site_list[i])$headers), "substackcdn"))->> sub_list
-      if(str_detect(rawToChar(curl::curl_fetch_memory(site_list[i])$headers), "substackcdn")==TRUE){
+      if(str_detect(rawToChar(curl::curl_fetch_memory(site_list[i])$headers), "substackcdn")){
         read_html(site_list[i]) -> meta_data
         append(meta_list ,str_remove(
           str_extract(
             toString(html_elements(meta_data, ".publication-meta")),pattern = '(?<=meta\\">)[a-zA-Z0-9 -_]+'), 
           pattern="</div>"))->>meta_list}
+      else{append(meta_list, "not scraped")->>meta_list}
     },  error= function(w){
       append(sub_list,"error")->>sub_list
-      append(meta_list, NULL)->>meta_list
+      append(meta_list, "error")->>meta_list
     }) 
   } 
 
-#else{append(meta_list, "not substack")->>meta_list}
-  # backup code
 
-  {
-  unique(possible_subs$pullURL) -> site_list
-  site_list <- paste0("https://www.",site_list)
-  sub_list  <- as.vector(NULL)
-  i<-0
-  for (i in 1:length(site_list)){
-    tryCatch({
-      append(sub_list, str_detect(rawToChar(curl::curl_fetch_memory(site_list[i])$headers), "substackcdn"))->> sub_list
-    },  error= function(w){
-      append(sub_list,"error")->>sub_list
-    }) 
-  } 
-  }
+  as.data.frame(cbind(
+    site_list,
+    sub_list,
+    meta_list))-> substackdetector_results
 
-cbind(site_list,sub_list,meta_list)
+    colnames(substackdetector_results)[1]<-"test_url"
+    colnames(substackdetector_results)[2]<-"result"
+    colnames(substackdetector_results)[3]<-"about"
+  
+  substackdetector_results$test_url<-str_remove(
+    substackdetector_results$test_url,"https://www.")
+  
+  paste0(
+    "https://substack.com/@",
+    str_remove(substackdetector_results$test_url,
+               "\\.ca|\\.co\\.uk|\\.com|\\.media|\\.news|\\.tv|\\.org|\\.net|\\.info|\\.blog")
+    )->substackdetector_results$about_page
+  
+  as.vector(str_remove(substackdetector_results$test_url[
+    which(substackdetector_results$result==TRUE)],"https://www.")) -> found_stacks
 
-as.data.frame(cbind(as.vector(site_list),as.vector(sub_list),as.vector(meta_list))) -> substackdetector_results
-colnames(substackdetector_results)[1]<-"test_url"
-colnames(substackdetector_results)[2]<-"result"
-colnames(substackdetector_results)[3]<-"about"
+  # second pass at substack metadata
+  
+      unique(substackdetector_results$about_page) -> profile_list
+      profile_data<- as.vector(NULL)
+      i<-0
+      for (i in 1:length(profile_list)){
+        tryCatch({
+          append(profile_data, str_extract(
+              toString(html_elements(read_html(substackdetector_results$about_page[i]), "a.pencraft.pc-reset.link-LIBpto")
+                       ),pattern = '[a-zA-Z0-9.,]+K\\+ subscribers'))->> profile_data
+        },  error= function(w){
+          append(profile_data,"error")->>profile_data
+        })} 
+        
+      cbind(substackdetector_results,profile_data)->substackdetector_results
 
-as.vector(str_remove(substackdetector_results$test_url[
-  which(substackdetector_results$result==TRUE)],"https://www.")
-  ) -> found_stacks
-
-# version 2
+      substackdetector_results %>% filter(result==TRUE|
+                                            str_detect(about,"subscriber|months")|
+                                            str_detect(profile_data,"subscriber")) -> substack_results_clean
+      
+      substack_results_clean %>% as.data.frame() -> substack_results_clean
+      substack_results_clean$about[is.na(substack_results_clean$about)]<-""
+      substack_results_clean$profile_data[is.na(substack_results_clean$profile_data)]<-""
+      
+      str_extract(substack_results_clean$about[
+        str_detect(substack_results_clean$about,"[0-9]+")],
+        "[0-9]+")
+      
+      substack_results_clean %>%
+        mutate(
+          subscribers=
+                 as.numeric(case_when(
+                   str_detect(about,"[0-9]+") ~ paste0(str_extract(about,"[0-9]+"),"000"),
+                   str_detect(profile_data,"[0-9]+") ~ paste0(str_extract(profile_data,"[0-9]+"),"000"),
+                   !str_detect(about,"[0-9]+") & !str_detect(profile_data,"[0-9]+") ~ "" ))) -> substack_results_clean
+        
+      write.csv(substack_results_clean,"~/gayagenda/datasets/subsets/other_subs.csv")
+      
+      # version 2
 
 mega_ds %>%
   filter(str_detect(EntryURL,"substack.com") | pullURL %in% found_stacks) %>% 
@@ -174,6 +208,10 @@ mega_ds %>%
   
     substackdetector_results[which(substackdetector_results$result=="error"),] |> table()
     
+    unique(sub$test_url)-> substacks
+    
+    mega_ds %>% filter(pullURL %in% substacks) -> substack_subset
+    
     # youtube ------------------------------------------------#
     # 
     
@@ -190,6 +228,7 @@ mega_ds %>%
       append(vid_list, x[[1]]$snippet$channelTitle) ->> vid_list
       sample(3)[1]<-sleepy ; Sys.sleep(sleepy) 
       print(vids(as.numeric(i)),"wait ",sleepy)} 
+    
     read_html(yt$EntryURL[1]) %>% html_elements("#text-container.ytd-channel-name")  -> x
     str_extract(x,"(?<=title=\")")
     
@@ -205,7 +244,7 @@ mega_ds %>%
       filter(pullURL=="bbc.co.uk")  %>% select(EntryTitle , year) %>% 
       arrange(desc(year)) -> beeb
     
-    search_query = "transgender child|trans child|trans kid|gender diverse child|children who identify"
+    search_query = "key|word"
     mega_ds %>%
       #filter(keyword=="transgender") %>%
       filter(pullURL=="bbc.co.uk") %>%
@@ -219,4 +258,6 @@ mega_ds %>%
       rename(google_news_keyword=keyword) %>%
       select(month, year, mention, pullURL, keyword, EntryTitle,google_news_keyword) %>% View()
     
+    # ATLANTIC
     
+    atlantic %>% arrange(desc(the_day)) %>% select(-the_day,-EntryContent) %>% select(EntryPublished,EntryTitle,region,keyword,dayweek,month,year,RSS) %>% write.csv("subsets/atlantic.csv")
