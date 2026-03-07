@@ -173,6 +173,11 @@ mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") &
         
       write.csv(substack_results_clean,"~/gayagenda/datasets/subsets/other_subs.csv")
       
+      read.csv("~/gayagenda/datasets/subsets/sub_roster.csv") -> sub_list
+      
+      mega_ds %>%
+        filter(pullURL %in% c(sub_list$test_url))
+      
       # version 2
 
 mega_ds %>%
@@ -212,6 +217,22 @@ mega_ds %>%
     
     mega_ds %>% filter(pullURL %in% substacks) -> substack_subset
     
+    install.packages("viridis")
+    library(viridis)
+    
+    mega_ds %>%
+      filter(pullURL %in% c(sub_list$test_url)) %>%
+      filter((region == "all regions") | (is.na(region)) )%>%
+      group_by(keyword,pullURL)%>%
+      mutate(count=n())%>%
+      ungroup() %>% 
+      ggplot(aes(keyword,count))+
+      geom_boxplot(aes(width = 0.2,colour = count))+
+      theme_minimal()+
+      scale_colour_viridis(discrete=T,option="D")+
+      scale_fill_viridis(discrete=T)
+      
+
     # youtube ------------------------------------------------#
     # 
     
@@ -258,6 +279,23 @@ mega_ds %>%
       rename(google_news_keyword=keyword) %>%
       select(month, year, mention, pullURL, keyword, EntryTitle,google_news_keyword) %>% View()
     
-    # ATLANTIC
     
-    atlantic %>% arrange(desc(the_day)) %>% select(-the_day,-EntryContent) %>% select(EntryPublished,EntryTitle,region,keyword,dayweek,month,year,RSS) %>% write.csv("subsets/atlantic.csv")
+    # Atlantic -----------------------------------------------#
+    # 
+    
+    atlantic %>% arrange(desc(the_day)) %>% 
+      select(-the_day,-EntryContent) %>% 
+      select(EntryPublished,EntryTitle,region,keyword,dayweek,month,year,RSS) %>% 
+      group_by(EntryTitle) %>% summarize(count=n()) %>%
+      arrange(desc(count)) %>%
+      write.csv("subsets/atlantic.csv")
+    
+    
+    
+    atlantic %>% 
+      select(EntryPublished,EntryTitle,region,keyword,dayweek,month,year,RSS,the_day,EntryURL) %>% 
+      group_by(EntryTitle) %>% mutate(count=n()) %>%
+      ungroup()%>%
+      arrange(desc(count)) %>%
+      write.csv("subsets/atlantic_morevars.csv")
+    
