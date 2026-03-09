@@ -3,7 +3,7 @@
 # jessdkant.bsky.social
 # tech.lgbt/@jessdkant
 
-read.csv("~/gayagenda/datasets/nightly_2026_02_16.csv") -> mega_ds
+read.csv("~/nightly_2026_03_05.csv") -> mega_ds
 
 # fox news  ----------------------------------------------#
 #
@@ -42,7 +42,7 @@ mega_ds %>% filter(pullURL=="pressreader.com") %>%
     mutate(pubdate=str_extract(EntryURL,'(?=[0-9]{8})[0-9]+')) %>%
     mutate(articleID=str_extract(EntryURL,'[0-9]+(?<=[0-9]{15})')) -> pressr
   
-pressr |> select(the_day, country, EntryURL, pubdate, articleID, publication, region) %>% View()
+pressr |> select(the_day, country, EntryURL, EntryContent, pubdate, articleID, publication, region) %>% View()
 
 pressr %>% select(year, publication, country, region) %>% 
   group_by(year, publication, country, region) %>% summarize(num=n()) %>% 
@@ -202,7 +202,18 @@ mega_ds %>%
   select(the_day,month,year,keyword,EntryTitle,pullURL,subname, post_ID, EntryURL,post_count) -> substack
 
    substack$subname<-gsub(".com","",substack$subname)
-         
+   
+
+   substack %>% 
+     mutate(type=
+              case_when(
+                str_detect(EntryURL,"/post/")==TRUE ~ "post",
+                !str_detect(EntryURL,"/post/")==TRUE & str_detect(EntryURL,"/p/[a-zA-Z0-9_-]+") ~ "article"
+              )) %>% 
+     filter(!is.na(type))%>%
+     ggplot()+
+     geom_bar(aes(x=year,group=type,fill=type),position = position_dodge())
+   
     # write month/year stamped CSV
   
   { getwd() -> curr_dir
@@ -215,23 +226,7 @@ mega_ds %>%
     
     unique(sub$test_url)-> substacks
     
-    mega_ds %>% filter(pullURL %in% substacks) -> substack_subset
     
-    install.packages("viridis")
-    library(viridis)
-    
-    mega_ds %>%
-      filter(pullURL %in% c(sub_list$test_url)) %>%
-      filter((region == "all regions") | (is.na(region)) )%>%
-      group_by(keyword,pullURL)%>%
-      mutate(count=n())%>%
-      ungroup() %>% 
-      ggplot(aes(keyword,count))+
-      geom_boxplot(aes(width = 0.2,colour = count))+
-      theme_minimal()+
-      scale_colour_viridis(discrete=T,option="D")+
-      scale_fill_viridis(discrete=T)
-      
 
     # youtube ------------------------------------------------#
     # 
@@ -243,15 +238,32 @@ mega_ds %>%
                         select(EntryURL, pullURL, video_ID) %>% 
                         distinct(video_ID) 
     as.vector(vids$video_ID)->vids
+    
     vid_list  <- as.vector(NULL)
     i<-0 ; for (i in 1:length(vids)){
      get_video_details(video_id = vids[as.numeric(i)])$items ->> x
       append(vid_list, x[[1]]$snippet$channelTitle) ->> vid_list
       sample(3)[1]<-sleepy ; Sys.sleep(sleepy) 
-      print(vids(as.numeric(i)),"wait ",sleepy)} 
+      print(vids(as.numeric(i)),"wait ",sleepy)
+      } 
     
-    read_html(yt$EntryURL[1]) %>% html_elements("#text-container.ytd-channel-name")  -> x
-    str_extract(x,"(?<=title=\")")
+    vid_list  <- as.vector(NULL)
+    #i<-0 ; for (i in 1:length(vids)){
+    i<-0 ; for (i in 20:25){
+      targ_url <- paste0("https://youtube.com/watch?v=",vids[i])
+      read_html_live(targ_url) %>% html_elements("#text-container.ytd-channel-name") ->> x
+      cat(x)
+      if(toString(x)==""){
+        read_html_live(targ_url) %>% html_elements("#yt-simple-endpoint.style-scope.yt-formatted-string") ->> x
+        append(vid_list, html_text(x))->> vid_list
+      }
+      append(vid_list, html_text(x))->> vid_list
+    } 
+    
+
+      
+
+  
     
     # BBC ----------------------------------------------------#
     # 
