@@ -163,6 +163,7 @@ mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") &
         str_detect(substack_results_clean$about,"[0-9]+")],
         "[0-9]+")
       
+          
       substack_results_clean %>%
         mutate(
           subscribers=
@@ -199,20 +200,9 @@ mega_ds %>%
   mutate(post_count=n())%>%
   arrange(desc(post_count))%>%
   ungroup()%>%
-  select(the_day,month,year,keyword,EntryTitle,pullURL,subname, post_ID, EntryURL,post_count) -> substack
+  select(the_day,month,year,keyword,EntryTitle,pullURL,subname, post_ID, EntryURL,post_count, region) -> substack
 
    substack$subname<-gsub(".com","",substack$subname)
-   
-
-   substack %>% 
-     mutate(type=
-              case_when(
-                str_detect(EntryURL,"/post/")==TRUE ~ "post",
-                !str_detect(EntryURL,"/post/")==TRUE & str_detect(EntryURL,"/p/[a-zA-Z0-9_-]+") ~ "article"
-              )) %>% 
-     filter(!is.na(type))%>%
-     ggplot()+
-     geom_bar(aes(x=year,group=type,fill=type),position = position_dodge())
    
     # write month/year stamped CSV
   
@@ -255,6 +245,9 @@ mega_ds %>%
       cat(x)
       if(toString(x)==""){
         read_html_live(targ_url) %>% html_elements("#yt-simple-endpoint.style-scope.yt-formatted-string") ->> x
+        if(toString(x)==""){
+          x<-"error"
+        }
         append(vid_list, html_text(x))->> vid_list
       }
       append(vid_list, html_text(x))->> vid_list
@@ -310,4 +303,25 @@ mega_ds %>%
       ungroup()%>%
       arrange(desc(count)) %>%
       write.csv("subsets/atlantic_morevars.csv")
+    
+
+    # finding artifacts
+    
+    mega_ds %>% 
+      filter(str_detect(EntryURL,"\\?")==TRUE & str_detect(EntryURL,"\\=")==TRUE) %>% 
+      mutate(subscriber_ID=str_extract(EntryURL, "(?<=\\?r\\=)[a-z0-9A-Z]+|(?<=\\&r\\=)[a-z0-9A-Z]+")) %>% 
+      mutate(argstring=str_extract(EntryURL, "(?<=r\\=).*")) %>% 
+      filter(!is.na(subscriber_ID)) %>% 
+      select(the_day,dayweek,year,keyword,region,subscriber_ID,argstring) %>%
+      as_tibble()
+    
+    
+    
+    mega_ds %>% 
+      filter(str_detect(EntryURL,"\\?")==TRUE & str_detect(EntryURL,"\\=")==TRUE) %>% 
+      filter(str_detect(EntryURL, "fckeditor|\\&Connector\\=")==TRUE) %>%
+      mutate(argstring=str_extract(EntryURL, "(?<=\\?).*")) %>% 
+      select(EntryPublished,keyword,pullURL,argstring) %>%
+      as_tibble()
+    
     
