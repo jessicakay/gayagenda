@@ -247,14 +247,8 @@ mega_ds %>%
 
     # api: new version #
     
-    #i<-0 ; for (i in 1:length(vids)){
-    #  get_video_details(video_id = vids[as.numeric(i)])$items ->> x
     #  append(vid_list, x[[1]]$snippet$channelTitle) ->> vid_list
-    #  rbind(channel_list,as.data.frame(zyx[[1]]$snippet))->>channel_list
-    #  sample(5)[1]->sleepy ; Sys.sleep(sleepy) 
-    #  print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
-    #} 
-    
+
     vid_list <- NULL
     channel_list <-NULL
     youtube_scrape <-NULL
@@ -262,24 +256,14 @@ mega_ds %>%
              get_video_details(video_id = vids[as.numeric(i)])$items ->> x
              append(vid_list, x$channelTitle) ->> vid_list
              rbind(youtube_scrape,c(vids[i],x[[1]]$snippet$publishedAt,x[[1]]$snippet$channelTitle,x[[1]]$snippet$channelId))->> youtube_scrape
-             sample(3)[1]->sleepy ; Sys.sleep(sleepy) 
+             sample(1)[1]->sleepy ; Sys.sleep(sleepy) 
              print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
-           } 
-    
-    
-    i<-0 ; for (i in 1:4){
-      get_video_details(video_id = vids[as.numeric(i)])$items ->> zyx
-      zyx <<- as.data.frame(zyx) %>% as.vector()
-      append(vid_list, x$snippet$channelTitle) ->> vid_list
-      rbind(channel_list,as.data.frame(zyx[[1]]$snippet))->>channel_list
-      sample(5)[1]->sleepy ; Sys.sleep(sleepy) 
-      print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
-    } 
-    
-    
-    
+        } 
+        
     # rvest version 1 #
+
     vid_list  <- as.vector(NULL)
+    
     #i<-0 ; for (i in 1:length(vids)){
     i<-0 ; for (i in 20:25){
       targ_url <- paste0("https://youtube.com/watch?v=",vids[i])
@@ -288,15 +272,8 @@ mega_ds %>%
         read_html_live(targ_url) %>% html_elements("#yt-simple-endpoint.style-scope.yt-formatted-string") ->> x
         if(toString(x)==""){
           append(vid_list, "error")->> vid_list
-        }
-      }
-      append(vid_list, html_text(x))->> vid_list
-    } 
+        }}append(vid_list, html_text(x))->> vid_list} 
 
-    vid_list  <- as.vector(NULL)
-    
-    #read_html_live(targ_url) %>% html_elements("#yt-simple-endpoint.style-scope.yt-formatted-string") ->> x
-    
     # rvest version 2 #
    
     match(vids,channel_list)
@@ -304,21 +281,12 @@ mega_ds %>%
     i<-0 ; for (i in 1:100){
       targ_url <- paste0("https://youtube.com/watch?v=",vids[i])
       read_html_live(targ_url) %>% html_elements("#text-container.ytd-channel-name") %>% html_text() ->> x
-      if(length(x)==0){
-        
-      }
       print(paste0(targ_url, x))
       append(vid_list, x)->> vid_list
       rbind(channel_list,c(targ_url,x)) ->> channel_list
       sample(30)[1]->sleepy ; Sys.sleep(sleepy) 
       print(paste0("wait ",sleepy," seconds...\n"))
     }
-    
-
-      targ_url <- paste0("https://youtube.com/watch?v=",vids[2])
-      read_html_live(targ_url) %>% html_elements("a.text-container.yt-simple-endpoint.style-scope.yt-formatted-string") 
-
-  
     
     # BBC ----------------------------------------------------#
     # 
