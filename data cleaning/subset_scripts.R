@@ -77,7 +77,7 @@ pressr_unique %>% select(publication,country) %>% table()
 pressr_unique %>% group_by(country) %>% summarize(n=n()) %>% arrange(desc(n))
 
 pressr %>% 
-  select(-contains("Entry")) %>% select(-cutvars) %>% 
+  select(-contains("Entry")) %>% select(-cutvars) %>%
   arrange(country, publication) %>% 
   write.csv(file = "~/gayagenda/datasets/subsets/pressreader.csv")
 
@@ -221,10 +221,14 @@ mega_ds %>%
     # youtube ------------------------------------------------#
     # 
 
+    # starting with smaller subset for API quota
+    
     mega_ds %>% filter(pullURL=="youtube.com") %>% 
-      mutate(video_ID=str_extract(EntryURL, '(?<=watch\\?v=)[a-zA-Z0-9-_]+')) -> youtube 
+      mutate(video_ID=str_extract(EntryURL, '(?<=watch\\?v=)[a-zA-Z0-9-_]+')) %>%
+      filter(year==2024)-> youtube 
       
     vids <- mega_ds %>% filter(pullURL=="youtube.com") %>% 
+                        filter(year==2024) %>%
                         mutate(video_ID=str_extract(
                           EntryURL, '(?<=watch\\?v=)[a-zA-Z0-9-_]+')
                           ) %>% 
@@ -232,14 +236,49 @@ mega_ds %>%
                         distinct(video_ID) 
     as.vector(vids$video_ID)->vids
     
-    vid_list  <- as.vector(NULL)
-    i<-0 ; for (i in 1:length(vids)){
-     get_video_details(video_id = vids[as.numeric(i)])$items ->> x
-      append(vid_list, x[[1]]$snippet$channelTitle) ->> vid_list
-      sample(3)[1]<-sleepy ; Sys.sleep(sleepy) 
-      print(vids(as.numeric(i)),"wait ",sleepy)
-      } 
+    # api: old version
     
+      i<-0 ; for (i in 1:length(vids)){
+       get_video_details(video_id = vids[as.numeric(i)])$items ->> x
+        append(vid_list, x[[1]]$snippet$channelTitle) ->> vid_list
+        sample(3)[1]<-sleepy ; Sys.sleep(sleepy) 
+        print(vids(as.numeric(i)),"wait ",sleepy)
+        } 
+
+    # api: new version #
+    
+    #i<-0 ; for (i in 1:length(vids)){
+    #  get_video_details(video_id = vids[as.numeric(i)])$items ->> x
+    #  append(vid_list, x[[1]]$snippet$channelTitle) ->> vid_list
+    #  rbind(channel_list,as.data.frame(zyx[[1]]$snippet))->>channel_list
+    #  sample(5)[1]->sleepy ; Sys.sleep(sleepy) 
+    #  print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
+    #} 
+    
+    vid_list <- NULL
+    channel_list <-NULL
+    youtube_scrape <-NULL
+        i<-0 ; for (i in 1:length(vids)){
+             get_video_details(video_id = vids[as.numeric(i)])$items ->> x
+             append(vid_list, x$channelTitle) ->> vid_list
+             rbind(youtube_scrape,c(vids[i],x[[1]]$snippet$publishedAt,x[[1]]$snippet$channelTitle,x[[1]]$snippet$channelId))->> youtube_scrape
+             sample(3)[1]->sleepy ; Sys.sleep(sleepy) 
+             print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
+           } 
+    
+    
+    i<-0 ; for (i in 1:4){
+      get_video_details(video_id = vids[as.numeric(i)])$items ->> zyx
+      zyx <<- as.data.frame(zyx) %>% as.vector()
+      append(vid_list, x$snippet$channelTitle) ->> vid_list
+      rbind(channel_list,as.data.frame(zyx[[1]]$snippet))->>channel_list
+      sample(5)[1]->sleepy ; Sys.sleep(sleepy) 
+      print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
+    } 
+    
+    
+    
+    # rvest version 1 #
     vid_list  <- as.vector(NULL)
     #i<-0 ; for (i in 1:length(vids)){
     i<-0 ; for (i in 20:25){
@@ -254,12 +293,12 @@ mega_ds %>%
       append(vid_list, html_text(x))->> vid_list
     } 
 
-
+    vid_list  <- as.vector(NULL)
+    
     #read_html_live(targ_url) %>% html_elements("#yt-simple-endpoint.style-scope.yt-formatted-string") ->> x
     
-    vid_list  <- as.vector(NULL)
-    channel_list <<- data.frame(url=c("url"),channel=c("channel")) %>% as.data.frame()
-
+    # rvest version 2 #
+   
     match(vids,channel_list)
     
     i<-0 ; for (i in 1:100){
