@@ -177,7 +177,7 @@ mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") &
       read.csv("~/gayagenda/datasets/subsets/sub_roster.csv") -> sub_list
       
       mega_ds %>%
-        filter(pullURL %in% c(sub_list$test_url))
+        filter(pullURL %in% c(sub_list$test_url)) -> substack
       
       # version 2
 
@@ -220,7 +220,10 @@ mega_ds %>%
 
     # youtube ------------------------------------------------#
     # 
-    
+
+    mega_ds %>% filter(pullURL=="youtube.com") %>% 
+      mutate(video_ID=str_extract(EntryURL, '(?<=watch\\?v=)[a-zA-Z0-9-_]+')) -> youtube 
+      
     vids <- mega_ds %>% filter(pullURL=="youtube.com") %>% 
                         mutate(video_ID=str_extract(
                           EntryURL, '(?<=watch\\?v=)[a-zA-Z0-9-_]+')
@@ -242,19 +245,39 @@ mega_ds %>%
     i<-0 ; for (i in 20:25){
       targ_url <- paste0("https://youtube.com/watch?v=",vids[i])
       read_html_live(targ_url) %>% html_elements("#text-container.ytd-channel-name") ->> x
-      cat(x)
       if(toString(x)==""){
         read_html_live(targ_url) %>% html_elements("#yt-simple-endpoint.style-scope.yt-formatted-string") ->> x
         if(toString(x)==""){
-          x<-"error"
+          append(vid_list, "error")->> vid_list
         }
-        append(vid_list, html_text(x))->> vid_list
       }
       append(vid_list, html_text(x))->> vid_list
     } 
+
+
+    #read_html_live(targ_url) %>% html_elements("#yt-simple-endpoint.style-scope.yt-formatted-string") ->> x
+    
+    vid_list  <- as.vector(NULL)
+    channel_list <<- data.frame(url=c("url"),channel=c("channel")) %>% as.data.frame()
+
+    match(vids,channel_list)
+    
+    i<-0 ; for (i in 1:100){
+      targ_url <- paste0("https://youtube.com/watch?v=",vids[i])
+      read_html_live(targ_url) %>% html_elements("#text-container.ytd-channel-name") %>% html_text() ->> x
+      if(length(x)==0){
+        
+      }
+      print(paste0(targ_url, x))
+      append(vid_list, x)->> vid_list
+      rbind(channel_list,c(targ_url,x)) ->> channel_list
+      sample(30)[1]->sleepy ; Sys.sleep(sleepy) 
+      print(paste0("wait ",sleepy," seconds...\n"))
+    }
     
 
-      
+      targ_url <- paste0("https://youtube.com/watch?v=",vids[2])
+      read_html_live(targ_url) %>% html_elements("a.text-container.yt-simple-endpoint.style-scope.yt-formatted-string") 
 
   
     
@@ -312,16 +335,23 @@ mega_ds %>%
       mutate(subscriber_ID=str_extract(EntryURL, "(?<=\\?r\\=)[a-z0-9A-Z]+|(?<=\\&r\\=)[a-z0-9A-Z]+")) %>% 
       mutate(argstring=str_extract(EntryURL, "(?<=r\\=).*")) %>% 
       filter(!is.na(subscriber_ID)) %>% 
-      select(the_day,dayweek,year,keyword,region,subscriber_ID,argstring) %>%
+      select(the_day,dayweek,year,keyword, region,subscriber_ID,argstring) %>% View()
+    
       as_tibble()
     
+      
+      
+    # skynews
+      
+      mega_ds %>% 
+        #filter(year!=2026) %>%
+        filter(str_detect(tolower(EntryURL), "skynews")) %>% 
+        select(pullURL,year) %>% table() -> sky_table 
+        
+      sky_table %>% prop.table() %>% round(2)
+      sky_table %>% prop.table() %>% round(2)
     
     
-    mega_ds %>% 
-      filter(str_detect(EntryURL,"\\?")==TRUE & str_detect(EntryURL,"\\=")==TRUE) %>% 
-      filter(str_detect(EntryURL, "fckeditor|\\&Connector\\=")==TRUE) %>%
-      mutate(argstring=str_extract(EntryURL, "(?<=\\?).*")) %>% 
-      select(EntryPublished,keyword,pullURL,argstring) %>%
-      as_tibble()
-    
+ #      filter(str_detect(EntryURL, "fckeditor|\\&Connector\\=")==TRUE) %>%
+
     
