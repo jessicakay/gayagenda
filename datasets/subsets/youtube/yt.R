@@ -51,7 +51,6 @@ youtube2023 %>% distinct(EntryURL,.keep_all = T) %>%
   select(`channel name`) %>%table() |> View()
 
 
-
 c("EntryPublished","video_ID",
   "posted_on_YT","channel name","yt_long_ID","EntryTitle",
   "EntryURL","keyword","region","RSS") -> pull_columns
@@ -147,4 +146,32 @@ yt_df %>%
           legend.position = "bottom")+
     scale_fill_paletteer_d("beyonce::X98")+
     facet_grid(.~keyword)
+  
+  
+  yt_2023to2025 %>% distinct(EntryURL,.keep_all = T) %>% 
+    filter(keyword %in% c("biological sex","gender identity","transgender")) %>%
+    filter(region=="all regions") %>%
+    mutate(the_day=as.Date(mdy(str_extract(
+      EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
+    mutate(month=month(lubridate::as_date(the_day))) %>%
+    mutate(year = year(lubridate::as_date(the_day))) %>%
+    group_by(`channel name`)%>%
+    mutate(num_per_channel=n()) %>%
+    group_by(`channel name`, keyword)%>%
+    mutate(num_channel_by_kw=n()) %>% 
+    group_by(`channel name`,keyword,year)%>%
+    mutate(num_chan_kw_year=n())%>%
+    select(year,EntryTitle,contains("num")) %>% View()
+  
+  as.data.frame(x$items) |> select(contains("snippet.tag")) |> names()
+  
+  yt_2023to2025 %>% rename(channel_unique_ID=yt_long_ID) -> yt_2023to2025
+  merge(yt_2023to2025,subscriber_scrape,by=c("channel_unique_ID"))
+  left_join(yt_2023to2025,subscriber_scrape,by=c("channel_unique_ID")) -> yt_master_dsac
+  
+  yt_master_ds[
+    which(yt_master_ds$`channel name`==yt_master_ds$channel_unique_ID),
+    ] # video unavailable? see: https://www.youtube.com/watch?v=uDZiru1rPng
+  
+  
   
