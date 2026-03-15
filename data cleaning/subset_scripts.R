@@ -17,9 +17,7 @@ read.csv("~/nightly_2026_03_05.csv") -> mega_ds
                        str_detect(EntryURL,"/video/") == FALSE ~ "article"
                      )) %>% 
     mutate(cat=gsub("/","",str_extract(EntryURL,pattern="/[a-z-]+/"))) -> just_fox
-
-# create subset CSV
-
+  
     write.csv(just_fox, "~/gayagenda/datasets/subsets/just_fox.csv",row.names = FALSE)
 
 # top outlets only - top 100
@@ -84,10 +82,10 @@ pressr %>%
 # substack -----------------------------------------------#
 #
 
-# find potential stacks that are not on substack sub/domains
+  # find potential stacks that are not on substack sub/domains
 
 
-mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") & 
+  mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") & 
                      !str_detect(EntryURL,"substack.com")) %>% select(pullURL,EntryURL) -> possible_subs
 
   # subscriber pull v2
@@ -112,7 +110,6 @@ mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") &
       append(meta_list, "error")->>meta_list
     }) 
   } 
-
 
   as.data.frame(cbind(
     site_list,
@@ -160,17 +157,15 @@ mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") &
       substack_results_clean$profile_data[is.na(substack_results_clean$profile_data)]<-""
       
       str_extract(substack_results_clean$about[
-        str_detect(substack_results_clean$about,"[0-9]+")],
-        "[0-9]+")
+        str_detect(substack_results_clean$about,"[0-9]+")],"[0-9]+")
       
-          
       substack_results_clean %>%
-        mutate(
-          subscribers=
+        mutate(subscribers=
                  as.numeric(case_when(
                    str_detect(about,"[0-9]+") ~ paste0(str_extract(about,"[0-9]+"),"000"),
                    str_detect(profile_data,"[0-9]+") ~ paste0(str_extract(profile_data,"[0-9]+"),"000"),
-                   !str_detect(about,"[0-9]+") & !str_detect(profile_data,"[0-9]+") ~ "" ))) -> substack_results_clean
+                   !str_detect(about,"[0-9]+") & !str_detect(profile_data,"[0-9]+") ~ "" ))) -> 
+        substack_results_clean
         
       write.csv(substack_results_clean,"~/gayagenda/datasets/subsets/other_subs.csv")
       
@@ -180,27 +175,27 @@ mega_ds %>% filter(str_detect(EntryURL,"/p/[a-zA-Z0-9]+") &
         filter(pullURL %in% c(sub_list$test_url)) -> substack
       
       # version 2
-
-mega_ds %>%
-  filter(str_detect(EntryURL,"substack.com") | pullURL %in% found_stacks) %>% 
-  mutate(substack=pullURL)%>%
-  mutate(subname= case_when(
-    str_detect(pullURL,"[a-z]+.substack.com")==FALSE & !(pullURL %in% found_stacks)  ~ "substack.com",
-    str_detect(pullURL,"[a-z]+.substack.com")==TRUE ~ str_extract(pullURL,"[a-z_]+(?=.substack.com)"),
-    pullURL %in% found_stacks ~ pullURL)) %>%  
-  mutate(post_ID = case_when(
-    str_detect(EntryURL,"\\/p\\/[a-z0-9A-Z-]+")==TRUE ~ gsub(
-      "-"," ",str_remove(str_extract(EntryURL,"\\/p\\/[a-z0-9A-Z-]+"),"/p/")),
-    str_detect(EntryURL,"post\\/[a-z0-9A-Z-]+")==TRUE ~ str_remove(
-      str_extract(EntryURL,"post\\/[a-z0-9A-Z-]+"),"post/p-"),
-    str_detect(EntryURL,"\\/p\\/[a-z0-9A-Z-]+")==FALSE & 
-      str_detect(EntryURL,"post\\/[a-z0-9A-Z-]+")==FALSE ~ str_extract(EntryURL,".com/[a-z-]+")
-  ))%>%
-  group_by(pullURL,keyword,year)%>%
-  mutate(post_count=n())%>%
-  arrange(desc(post_count))%>%
-  ungroup()%>%
-  select(the_day,month,year,keyword,EntryTitle,pullURL,subname, post_ID, EntryURL,post_count, region) -> substack
+    
+    mega_ds %>%
+      filter(str_detect(EntryURL,"substack.com") | pullURL %in% found_stacks) %>% 
+      mutate(substack=pullURL)%>%
+      mutate(subname= case_when(
+        str_detect(pullURL,"[a-z]+.substack.com")==FALSE & !(pullURL %in% found_stacks)  ~ "substack.com",
+        str_detect(pullURL,"[a-z]+.substack.com")==TRUE ~ str_extract(pullURL,"[a-z_]+(?=.substack.com)"),
+        pullURL %in% found_stacks ~ pullURL)) %>%  
+      mutate(post_ID = case_when(
+        str_detect(EntryURL,"\\/p\\/[a-z0-9A-Z-]+")==TRUE ~ gsub(
+          "-"," ",str_remove(str_extract(EntryURL,"\\/p\\/[a-z0-9A-Z-]+"),"/p/")),
+        str_detect(EntryURL,"post\\/[a-z0-9A-Z-]+")==TRUE ~ str_remove(
+          str_extract(EntryURL,"post\\/[a-z0-9A-Z-]+"),"post/p-"),
+        str_detect(EntryURL,"\\/p\\/[a-z0-9A-Z-]+")==FALSE & 
+          str_detect(EntryURL,"post\\/[a-z0-9A-Z-]+")==FALSE ~ str_extract(EntryURL,".com/[a-z-]+")
+      ))%>%
+      group_by(pullURL,keyword,year)%>%
+      mutate(post_count=n())%>%
+      arrange(desc(post_count))%>%
+      ungroup()%>%
+      select(the_day,month,year,keyword,EntryTitle,pullURL,subname, post_ID, EntryURL,post_count, region) -> substack
 
    substack$subname<-gsub(".com","",substack$subname)
    
@@ -216,8 +211,6 @@ mega_ds %>%
     
     unique(sub$test_url)-> substacks
     
-    
-
     # youtube ------------------------------------------------#
     # 
 
@@ -225,10 +218,10 @@ mega_ds %>%
     
     mega_ds %>% filter(pullURL=="youtube.com") %>% 
       mutate(video_ID=str_extract(EntryURL, '(?<=watch\\?v=)[a-zA-Z0-9-_]+')) %>%
-      filter(year==2024)-> youtube 
-      
+      filter(year==2025)-> youtube 
+  
     vids <- mega_ds %>% filter(pullURL=="youtube.com") %>% 
-                        filter(year==2024) %>%
+                        filter(year==2025) %>%
                         mutate(video_ID=str_extract(
                           EntryURL, '(?<=watch\\?v=)[a-zA-Z0-9-_]+')
                           ) %>% 
@@ -247,8 +240,6 @@ mega_ds %>%
 
     # api: new version #
     
-    #  append(vid_list, x[[1]]$snippet$channelTitle) ->> vid_list
-
     vid_list <- NULL
     channel_list <-NULL
     youtube_scrape <-NULL
@@ -260,7 +251,7 @@ mega_ds %>%
              print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
         } 
         
-    # rvest version 1 #
+        # rvest version 1 #
 
     vid_list  <- as.vector(NULL)
     
@@ -306,8 +297,10 @@ mega_ds %>%
       filter(pullURL=="bbc.co.uk") %>%
       mutate(mention= 
                case_when(
-                 str_detect(tolower(EntryContent), pattern=search_query )==TRUE ~ str_extract(tolower(EntryContent),search_query),
-                 str_detect(tolower(EntryTitle), pattern=search_query )==TRUE ~ str_extract(tolower(EntryTitle),search_query)
+                 str_detect(tolower(EntryContent), pattern=search_query )==TRUE ~ 
+                   str_extract(tolower(EntryContent),search_query),
+                 str_detect(tolower(EntryTitle), pattern=search_query )==TRUE ~ 
+                   str_extract(tolower(EntryTitle),search_query)
                )) %>%  
       arrange(desc(year), desc(month)) %>%
       distinct(EntryURL, .keep_all = T)%>%
@@ -325,8 +318,6 @@ mega_ds %>%
       arrange(desc(count)) %>%
       write.csv("subsets/atlantic.csv")
     
-    
-    
     atlantic %>% 
       select(EntryPublished,EntryTitle,region,keyword,dayweek,month,year,RSS,the_day,EntryURL) %>% 
       group_by(EntryTitle) %>% mutate(count=n()) %>%
@@ -334,31 +325,47 @@ mega_ds %>%
       arrange(desc(count)) %>%
       write.csv("subsets/atlantic_morevars.csv")
     
-
     # finding artifacts
-    
+
     mega_ds %>% 
       filter(str_detect(EntryURL,"\\?")==TRUE & str_detect(EntryURL,"\\=")==TRUE) %>% 
       mutate(subscriber_ID=str_extract(EntryURL, "(?<=\\?r\\=)[a-z0-9A-Z]+|(?<=\\&r\\=)[a-z0-9A-Z]+")) %>% 
-      mutate(argstring=str_extract(EntryURL, "(?<=r\\=).*")) %>% 
-      filter(!is.na(subscriber_ID)) %>% 
-      select(the_day,dayweek,year,keyword, region,subscriber_ID,argstring) %>% View()
+      mutate(argstring=str_extract(tolower(EntryURL), "(?<=connector).*|(?<=fckeditor).*|z0x.top.*")) %>% 
+      filter(!is.na(argstring)) %>% 
+      select(the_day,dayweek,year,keyword,argstring,EntryURL) %>% View()
     
-      as_tibble()
-    
-      
-      
-    # skynews
+
+    # skynews  -----------------------------------------------#
       
       mega_ds %>% 
         #filter(year!=2026) %>%
         filter(str_detect(tolower(EntryURL), "skynews")) %>% 
         select(pullURL,year) %>% table() -> sky_table 
         
-      sky_table %>% prop.table() %>% round(2)
-      sky_table %>% prop.table() %>% round(2)
+        sky_table %>% prop.table() %>% round(2)
+        sky_table %>% prop.table() %>% round(2)
     
     
- #      filter(str_detect(EntryURL, "fckeditor|\\&Connector\\=")==TRUE) %>%
+    # social -------------------------------------------------#
+        
+        
+        c( "msn.com","yahoo.com","aol.com", "pressreader.com") -> portals
+        c( "youtube.com",
+           "x.com",
+           "instagram.com",
+           "substack",
+           "facebook.com") ->socials 
+        c("transgender", "biological sex", "gender identity")-> main_kws
+        c("nature.com","sciencedirect.com") -> exc_sites
+        
+        top_outlets<-function(dataset_name, number){
+          dataset_name %>% filter(is.na(pullURL)==FALSE) %>%
+            filter(keyword %in% main_kws) %>%
+            filter(!(pullURL %in% portals)) %>% filter(!(pullURL %in% socials)) %>% filter(!pullURL %in% exc_sites) %>%
+            distinct(EntryURL, .keep_all = TRUE) %>% group_by(pullURL) %>% summarize(n=n()) %>% 
+            arrange(by_group=desc(n)) %>% head(n=number) %>% select(pullURL) -> tophits
+          as.vector(tophits$pullURL) ->> topouts} 
 
+    mega_ds %>% 
+      filter(pullURL %in% socials)
     
