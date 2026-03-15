@@ -349,10 +349,19 @@ pressr %>%
     # social -------------------------------------------------#
         
         
+        social_results %>% filter(pullURL=="x.com") %>% 
+          filter(str_detect(EntryURL,"grok")) %>% 
+          select(EntryTitle,EntryURL) %>% 
+          mutate(preview=head(EntryTitle))%>%
+          distinct(EntryURL,.keep_all = T) |> as_tibble()
+        
+        
         c( "msn.com","yahoo.com","aol.com", "pressreader.com") -> portals
         c( "youtube.com",
            "x.com",
            "instagram.com",
+           "twitter.com",
+           "reddit.com",
            "substack",
            "facebook.com") ->socials 
         c("transgender", "biological sex", "gender identity")-> main_kws
@@ -367,5 +376,58 @@ pressr %>%
           as.vector(tophits$pullURL) ->> topouts} 
 
     mega_ds %>% 
-      filter(pullURL %in% socials)
+      filter(pullURL %in% socials) -> social_results
     
+      social_results %>%   
+        group_by(pullURL,keyword)%>%
+        summarise(n=n()) 
+
+      social_results %>%
+        filter(region=="all regions"|is.na(region)) %>%
+        filter(year==2023|year==2024|year==2025)%>%
+        ggplot()+
+        ylab("")+xlab("")+
+        labs(title = "Social media in Google News results\n2023-2025")+
+        geom_bar(aes(x=keyword,fill=pullURL))+
+        facet_grid(.~year)+
+        labs(fill="platform",subtitle = "all regions")+
+        theme(plot.background=element_rect("white", colour = "white"),
+              panel.grid = element_line("white"),  
+              panel.background = element_rect("white"),
+              legend.background = element_rect("white"),
+              legend.box.background = element_rect("white",colour = "white"),
+              legend.frame = element_rect("white"),
+              legend.key = element_blank(),
+              text = element_text(colour = "black"),
+              legend.position = "right",
+              axis.text.x = element_blank(),
+              axis.ticks.x = element_blank(),
+              strip.background =element_rect("white"))+
+        scale_fill_paletteer_d("yarrr::info") -> top
+      
+      social_results %>%
+        filter(year==2023|year==2024|year==2025)%>%
+        filter(region=="all regions"|is.na(region)) %>%
+        filter(pullURL!="youtube.com")%>%
+        ggplot()+
+        ylab("")+xlab("")+
+        labs(title = "Excluding YouTube")+
+        geom_bar(aes(x=keyword,fill=pullURL))+
+        facet_grid(.~year)+
+        labs(fill="platform",
+             caption = "jessk.org/blog")+
+        theme(plot.background=element_rect("white", colour = "white"),
+              panel.grid = element_line("white"),  
+              panel.background = element_rect("white"),
+              legend.background = element_rect("white"),
+              legend.box.background = element_rect("white",colour = "white"),
+              legend.frame = element_rect("white"),
+              legend.key = element_blank(),
+              text = element_text(colour = "black"),
+              legend.position = "right",
+              axis.text.x = element_text(color="black", angle=90),
+              strip.background =element_rect("white"))+
+        scale_fill_paletteer_d("yarrr::info") -> bottom
+      
+      grid.arrange(top,bottom)
+      
