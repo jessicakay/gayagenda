@@ -351,8 +351,8 @@ pressr %>%
         
         social_results %>% filter(pullURL=="x.com") %>% 
           filter(str_detect(EntryURL,"grok")) %>% 
-          select(EntryTitle,EntryURL) %>% 
-          mutate(preview=head(EntryTitle))%>%
+          mutate(preview=substring(EntryTitle,1,50))%>%
+          select(EntryPublished,preview,keyword,EntryURL) %>%
           distinct(EntryURL,.keep_all = T) |> as_tibble()
         
         
@@ -430,4 +430,93 @@ pressr %>%
         scale_fill_paletteer_d("yarrr::info") -> bottom
       
       grid.arrange(top,bottom)
+      
+      
+      mega_ds %>% filter(is.na(pullURL)==FALSE) %>%
+        filter(keyword %in% main_kws) %>%
+        distinct(EntryURL, .keep_all = TRUE) %>% group_by(keyword,pullURL) %>% summarize(n=n()) %>% 
+        arrange(by_group=desc(n)) %>% head(n=10) %>% select(pullURL, keyword, n)
+        
+      mega_ds %>% filter(is.na(pullURL)==FALSE) %>%
+        filter(keyword %in% main_kws) %>%
+        distinct(EntryURL, .keep_all = TRUE) %>% group_by(keyword,pullURL) %>% summarize(n=n()) %>% 
+        arrange(by_group=desc(n)) %>% head(n=10) %>% select(pullURL, keyword, n)
+      
+        
+      mega_ds %>% filter(is.na(pullURL)==FALSE) %>%
+        distinct(EntryURL, .keep_all = TRUE) %>% group_by(keyword,pullURL) %>% summarize(n=n()) %>% 
+        arrange(by_group=desc(n)) %>% head(n=10) %>% select(pullURL, keyword, n)
+      
+      mega_ds %>% filter(is.na(pullURL)==FALSE) %>%
+        filter(region=="all regions"|is.na(region))%>%
+        distinct(EntryURL, .keep_all = TRUE) %>% group_by(keyword,pullURL) %>% summarize(n=n()) %>% 
+        arrange(by_group=desc(n)) %>% head(n=10) -> top_10_all
+      
+      top_10_all$pullURL-> top_10_all
+      
+      top_10_all 
+      
+      mega_ds %>%
+        filter(region=="all regions"|is.na(region))%>%
+        filter(pullURL %in% top_10_all)%>%
+        filter(year < 2026 & !is.na(year))%>%
+#        mutate(year=as.factor(year))%>%
+        group_by(pullURL,keyword,year)%>%
+        mutate(n=n())%>%
+        mutate(type=
+                 case_when(
+                   (pullURL=="msn.com" | pullURL== "yahoo.com") ~ "portal",
+                   (pullURL=="dailymail.co.uk" | pullURL== "foxnews.com") ~ "news",
+                   pullURL=="youtube.com" ~ "youtube"
+                 ))%>%
+        ggplot()+
+        geom_bar(aes(x=keyword, fill=keyword))+
+        xlab("")+ylab("jessk.org/blog\n\n")+
+        labs(title = "Top 5 domains in dataset")+
+        theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
+              panel.background = element_rect("white"),
+              legend.background = element_rect("white"),
+              legend.box.background = element_rect("white",colour = "white"),
+              legend.key = element_rect("white"),
+              text = element_text(colour = "black"),
+              legend.position = "none",
+              strip.background = element_rect("white"),
+              axis.text.x=element_blank(),
+              axis.ticks.x = element_blank(),
+              strip.text = element_text(color="black"),)+
+        scale_fill_paletteer_d("yarrr::decision")+
+        facet_grid(.~pullURL)-> img_1
+      
+      mega_ds %>%
+        filter(region=="all regions"|is.na(region))%>%
+        filter(pullURL %in% top_10_all)%>%
+        filter(year < 2026 & !is.na(year))%>%
+        #        mutate(year=as.factor(year))%>%
+        group_by(pullURL,keyword,year)%>%
+        mutate(n=n())%>%
+        mutate(type=
+                 case_when(
+                   (pullURL=="msn.com" | pullURL== "yahoo.com") ~ "portal",
+                   (pullURL=="dailymail.co.uk" | pullURL== "foxnews.com") ~ "news",
+                   pullURL=="youtube.com" ~ "youtube"
+                 ))%>%
+        ggplot()+
+        geom_bar(aes(x=keyword, fill=keyword))+
+        xlab("")+ylab("\n\n\n")+
+        labs(subtitle = "Top 5, by type")+
+        theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
+              panel.background = element_rect("white"),
+              legend.background = element_rect("white"),
+              legend.box.background = element_rect("white",colour = "white"),
+              legend.key = element_rect("white"),
+              text = element_text(colour = "black"),
+              legend.position = "right",
+              strip.background = element_rect("white"),
+              axis.text.x=element_blank(),
+              axis.ticks.x = element_blank(),
+              strip.text = element_text(color="black"),)+
+        scale_fill_paletteer_d("yarrr::decision")+
+        facet_grid(year~type)-> img_2
+        
+      grid.arrange(img_1, img_2,ncol=2)
       

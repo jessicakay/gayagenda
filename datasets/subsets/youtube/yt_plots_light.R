@@ -58,28 +58,6 @@
     scale_fill_paletteer_d("yarrr::nemo")+
     facet_grid(.~year)-> plot_b
   
-  yt_df %>%
-    filter(region=="all regions")%>%
-    filter(keyword %in% c("biological sex","gender identity","transgender")) %>%
-    mutate(year=as.factor(year))%>%
-    ggplot()+
-    xlab("")+ylab("\n\n\n")+
-    labs(fill="quarter")+
-    geom_bar(aes(x=keyword,fill=as.factor(quarter)),position = position_dodge(preserve = "single"))+
-    theme(plot.background=element_rect("white", colour = "white"),
-          panel.grid = element_line("white"),  
-          panel.background = element_rect("white"),
-          legend.background = element_rect("white"),
-          legend.box.background = element_rect("white",colour = "white"),
-          legend.frame = element_rect("white"),
-            legend.key = element_blank(),
-          text = element_text(colour = "black"),
-          legend.position = "bottom",
-          axis.text.x = element_text(color="black"),
-          strip.text = element_blank())+
-    scale_fill_paletteer_d("yarrr::nemo")+
-    facet_grid(.~year)-> plot_c
-  
   grid.arrange(plot_b, plot_c,ncol=1)->>image_b
   
 }
@@ -87,3 +65,4 @@
 grid.arrange(image_a,image_b,ncol=2,widths=c(2,4))
 
 #----------#
+
