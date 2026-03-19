@@ -342,6 +342,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
   
   
   like_scrape -> like_scrape2025
+  like_scrape -> like_scrape2024
   like_scrape -> like_scrape2023  
   
   like_scrape <-NULL
@@ -357,17 +358,215 @@ grid.arrange(plot_b, plot_c,ncol=1)
   
   like_scrape$id->like_scrape$video_ID
   
+  left_join(like_scrape,yt_master_ds,by = "video_ID") %>% filter(video_ID %in% vids_2023_cleaned$video_ID) -> yt2023_likes
+  left_join(like_scrape,yt_master_ds,by = "video_ID") %>% filter(video_ID %in% vids_2024_cleaned$video_ID) -> yt2024_likes 
   left_join(like_scrape,yt_master_ds,by = "video_ID") %>% filter(video_ID %in% vids_2025_cleaned$video_ID) -> yt2025_likes
+  
+  write.csv(yt2024_likes,"~/gayagenda/datasets/subsets/youtube/yt2024_likes.csv")
+  write.csv(yt2025_likes,"~/gayagenda/datasets/subsets/youtube/yt2025_likes.csv")
+
   
   yt2025_likes  %>% group_by(keyword)%>%
     mutate(m=mean(as.numeric(likeCount),na.rm=TRUE))%>% select(keyword,m) %>% distinct(keyword,.keep_all = T) %>% as_tibble() %>% arrange(desc(m))
   
-  left_join(like_scrape,yt_master_ds,by = "video_ID") %>% filter(video_ID %in% vids_2023_cleaned$video_ID) -> yt_2023_likes
-  
-  cbind(
-    
-    (yt_2023_likes  %>% group_by(keyword)%>%
+
+{  cbind(    (yt_2023_likes  %>% group_by(keyword)%>%
        mutate(m=mean(as.numeric(likeCount),na.rm=TRUE))%>% select(keyword,m) %>% distinct(keyword,.keep_all = T) %>% as_tibble() %>% arrange(desc(m))),
     (yt2025_likes  %>% group_by(keyword)%>%
-       mutate(m=mean(as.numeric(likeCount),na.rm=TRUE))%>% select(keyword,m) %>% distinct(keyword,.keep_all = T) %>% as_tibble() %>% arrange(desc(m)))) 
+       mutate(m=mean(as.numeric(likeCount),na.rm=TRUE))%>% select(keyword,m) %>% distinct(keyword,.keep_all = T) %>% as_tibble() %>% arrange(desc(m)))) } 
   
+  rbind(yt2023_likes,yt2024_likes,yt2025_likes) -> yt_likes_23_to_25
+  
+  yt_likes_23_to_25 %>% 
+    rename(channel_view_count=view_count)%>%
+    rename(video_views=viewCount.x) %>%
+    select(video_ID,EntryPublished,posted_on_YT,channel.name,channel_unique_ID,
+           video_views,likeCount,favoriteCount,commentCount,channel_view_count,keyword,region) %>%
+    filter(region=="all regions" | is.na(region))%>%
+    mutate(the_day=as.Date(mdy(str_extract(
+      EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
+    mutate(month=month(lubridate::as_date(the_day))) %>% 
+    mutate(year = year(lubridate::as_date(the_day))) -> yt_likes_23_to_25
+  
+  as.numeric(yt_likes_23_to_25$likeCount)->yt_likes_23_to_25$likeCount
+  as.numeric(yt_likes_23_to_25$favoriteCount)->yt_likes_23_to_25$favoriteCount
+  as.numeric(yt_likes_23_to_25$commentCount)->yt_likes_23_to_25$commentCount
+  as.numeric(yt_likes_23_to_25$video_views)->yt_likes_23_to_25$video_views
+  as.numeric(yt_likes_23_to_25$channel_view_count)->yt_likes_23_to_25$channel_view_count
+  
+    yt_likes_23_to_25 %>% head() %>% as_tibble() 
+  
+      
+    yt_likes_23_to_25 %>% summary() 
+    
+    aggregate(cbind(likeCount, commentCount) ~ keyword+ year,
+                dat=yt_likes_23_to_25[which(yt_likes_23_to_25$year==2025),],
+              mean)
+
+    c("JhIBqykjzbs")-> exc_list
+      
+  yt_likes_23_to_25 %>%
+    group_by(year,keyword,month)%>%
+    filter(!(video_ID %in% exc_list))%>%
+#    filter(keyword %in% main_kws)%>%
+    mutate(like_m=mean(likeCount,na.rm=TRUE))%>%
+    mutate(comm_m=mean(commentCount,na.rm=TRUE))%>%
+    #    mutate(ymonth=as_date(paste0(month,"-",year)))%>%
+    select(year,keyword,contains("_m")) %>%
+    ungroup()%>%
+    ggplot()+
+    xlab("")+ylab("\njessk.org/blog\n")+
+    labs(title = "Mean likes on YouTube per video per search term",
+         subtitle = "2023-2025, all regions\n\n")+
+    labs(size="mean comments",color="search term")+
+    #geom_bar(aes(color=as.factor(keyword)))+
+    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
+    geom_point(aes(y=like_m,x=as.factor(month),size=comm_m,color=keyword,group=keyword))+
+    #geom_boxplot(aes(y=commentCount))+
+    theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
+          panel.background = element_rect("white"),legend.background = element_rect("white"),
+          legend.box.background = element_rect("white",colour = "white"),legend.key = element_rect("white"),
+          text = element_text(colour = "black"),
+          legend.position = "right")+
+    scale_color_paletteer_d("yarrr::info")+
+    facet_grid(.~year) -> mean_plot
+  
+  
+  yt_likes_23_to_25 %>%
+    group_by(year,keyword,month)%>%
+    filter(!(video_ID %in% exc_list))%>%
+#    filter(keyword %in% main_kws)%>%
+    #mutate(like_m=mean(likeCount,na.rm=TRUE))%>%
+    #mutate(comm_m=mean(commentCount,na.rm=TRUE))%>%
+    mutate(like_m=median(likeCount,na.rm=TRUE))%>%
+    mutate(comm_m=median(commentCount,na.rm=TRUE))%>%
+#    mutate(ymonth=as_date(paste0(month,"-",year)))%>%
+    select(year,keyword,contains("_m")) %>%
+    ungroup()%>%
+    ggplot()+
+    xlab("")+ylab("")+
+    labs(size="median comments",color="search term")+
+    labs(title = "Median likes on YouTube per video per search term",
+         subtitle = "2023-2025, all regions\n\n")+
+    #geom_bar(aes(color=as.factor(keyword)))+
+    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
+    geom_point(aes(y=like_m,x=as.factor(month),size=comm_m,color=keyword,group=keyword))+
+    #geom_boxplot(aes(y=commentCount))+
+    theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
+          panel.background = element_rect("white"),legend.background = element_rect("white"),
+          legend.box.background = element_rect("white",fill="white"),legend.key = element_rect("white"),
+          text = element_text(colour = "black"),
+          legend.position = "right")+
+    scale_color_paletteer_d("yarrr::info")+
+    facet_grid(.~year) -> median_plot
+
+  grid.arrange(mean_plot,median_plot,ncol=2)  
+  
+  
+  
+  yt_likes_23_to_25 %>%
+    filter(!(video_ID %in% exc_list))%>%
+    group_by(month,year,keyword)%>%
+    mutate(like_med=mean(likeCount,na.rm=TRUE))%>%
+    mutate(comm_med=mean(commentCount,na.rm=TRUE))%>%
+    mutate(like_m=median(likeCount,na.rm=TRUE))%>%
+    mutate(comm_m=median(commentCount,na.rm=TRUE))%>%
+    mutate(max_like=max(likeCount,na.rm=TRUE))%>%
+    mutate(max_comm=max(commentCount,na.rm=TRUE))%>%
+    select(contains(c("_m","x_"))) %>%
+    distinct(month,year,keyword,.keep_all = T)
+  
+  yt_likes_23_to_25 %>%
+    filter(!(video_ID %in% exc_list))%>%
+    group_by(channel.name,month,year,keyword)%>%
+    mutate(n=n())%>%
+    arrange(desc(n))
+
+  yt_likes_23_to_25 %>%
+    filter(keyword %in% main_kws)%>%
+    filter(region=="all regions"|is.na(region))%>%
+    filter(!(video_ID %in% exc_list))%>%
+    group_by(channel.name,keyword)%>%
+    mutate(n=n())%>%
+    arrange(desc(n))%>%
+    ungroup()%>%
+    distinct(channel.name, .keep_all=T)%>%
+    head(20)%>%
+    select(channel.name,keyword,year,n)
+  
+table1::table1(~ factor(channel.name) + n  | keyword, data = yt_l)
+
+
+yt_likes_23_to_25 %>%
+  filter(keyword=="transgender")%>%
+  filter(region=="all regions"|is.na(region))%>%
+  filter(!(video_ID %in% exc_list))%>%
+  group_by(channel.name)%>%
+  mutate(n=n())%>%
+  arrange(desc(n))%>%
+  ungroup()%>%
+  distinct(channel.name, .keep_all=T)%>%
+  head(20)%>%
+  select(channel.name,n) %>% head(10) %>% as.data.frame() -> kw_trans
+
+
+yt_likes_23_to_25 %>%
+  filter(keyword=="biological sex")%>%
+  filter(region=="all regions"|is.na(region))%>%
+  filter(!(video_ID %in% exc_list))%>%
+  group_by(channel.name)%>%
+  mutate(n=n())%>%
+  arrange(desc(n))%>%
+  ungroup()%>%
+  distinct(channel.name, .keep_all=T)%>%
+  head(20)%>%
+  select(channel.name,n) %>% head(10) %>% as.data.frame() -> kw_biosex
+
+
+yt_likes_23_to_25 %>%
+  filter(keyword=="gender identity")%>%
+  filter(region=="all regions"|is.na(region))%>%
+  filter(!(video_ID %in% exc_list))%>%
+  group_by(channel.name)%>%
+  mutate(n=n())%>%
+  arrange(desc(n))%>%
+  ungroup()%>%
+  distinct(channel.name, .keep_all=T)%>%head(20)%>%
+  select(channel.name,n) %>% head(10) %>% as.data.frame() -> kw_genderi
+
+
+
+
+yt_likes_23_to_25 %>%
+  #filter(keyword=="transgender")%>%
+  filter(region=="all regions"|is.na(region))%>%
+  filter(!(video_ID %in% exc_list))%>%
+  group_by(year, keyword,channel.name)%>%
+  mutate(n=n())%>%
+  ungroup()%>%
+  arrange(desc(n))%>%
+  group_by(year, keyword)%>%
+  distinct(channel.name, keyword, year, .keep_all=TRUE) %>%
+  slice_max(order_by=n, n = 1, with_ties = FALSE) %>%
+  select(year, keyword, channel.name,n) -> first_place 
+
+yt_likes_23_to_25 %>%
+  #filter(keyword=="transgender")%>%
+  filter(region=="all regions"|is.na(region))%>%
+  filter(!(video_ID %in% exc_list))%>%
+  group_by(keyword,channel.name)%>%
+  mutate(n=n())%>%
+  ungroup()%>%
+  arrange(desc(n))%>%
+  group_by(keyword)%>%
+  distinct(channel.name, keyword, .keep_all=TRUE) %>%
+  #slice_max(order_by=n, n = 1, with_ties = FALSE) %>%
+  select(keyword, channel.name,n)%>%
+  head(20)->first_all
+
+  write.table(first_all,file=pipe('xclip -selection clipboard'), sep="\t") 
+
+first_place%>%
+  tidyr::pivot_wider(names_from=year, values_from = n) 
+
+
