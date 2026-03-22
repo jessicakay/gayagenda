@@ -408,7 +408,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
   yt_likes_23_to_25 %>%
     group_by(year,keyword,month)%>%
     filter(!(video_ID %in% exc_list))%>%
-    filter(keyword %in% main_kws)%>%
+#    filter(keyword %in% main_kws)%>%
     mutate(like_m=mean(likeCount,na.rm=TRUE))%>%
     mutate(comm_m=mean(commentCount,na.rm=TRUE))%>%
     #    mutate(ymonth=as_date(paste0(month,"-",year)))%>%
@@ -420,7 +420,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
          subtitle = "2023-2025, all regions\n\n")+
     labs(size="mean comments",color="search term")+
     #geom_bar(aes(color=as.factor(keyword)))+
-#    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
+    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
     geom_point(aes(y=like_m,x=as.factor(month),size=comm_m,color=keyword,group=keyword))+
     #geom_boxplot(aes(y=commentCount))+
     theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
@@ -435,7 +435,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
   yt_likes_23_to_25 %>%
     group_by(year,keyword,month)%>%
     filter(!(video_ID %in% exc_list))%>%
-    filter(keyword %in% main_kws)%>%
+#    filter(keyword %in% main_kws)%>%
     #mutate(like_m=mean(likeCount,na.rm=TRUE))%>%
     #mutate(comm_m=mean(commentCount,na.rm=TRUE))%>%
     mutate(like_m=median(likeCount,na.rm=TRUE))%>%
@@ -449,7 +449,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
     labs(title = "Median likes on YouTube per video per search term",
          subtitle = "2023-2025, all regions\n\n")+
     #geom_bar(aes(color=as.factor(keyword)))+
- #   geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
+    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
     geom_point(aes(y=like_m,x=as.factor(month),size=comm_m,color=keyword,group=keyword))+
     #geom_boxplot(aes(y=commentCount))+
     theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
@@ -475,7 +475,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
     mutate(max_like=max(likeCount,na.rm=TRUE))%>%
     mutate(max_comm=max(commentCount,na.rm=TRUE))%>%
     select(contains(c("_m","x_"))) %>%
-    distinct(month,year,keyword,.keep_all = T)
+    distinct(month,year,keyword,.keep_all = T) %>% View()
   
   yt_likes_23_to_25 %>%
     filter(!(video_ID %in% exc_list))%>%
@@ -545,22 +545,7 @@ first_place%>%
   tidyr::pivot_wider(names_from=year, values_from = n) 
 
 
-yt_master_ds %>%     mutate(the_day=as.Date(mdy(str_extract(
-  EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
-  mutate(month=month(lubridate::as_date(the_day))) %>% 
-  mutate(year = year(lubridate::as_date(the_day)))%>%
-  filter(channel.name %in% c("Sky News Australia", "GBNews")) %>% arrange(EntryPublished) %>% select(year,keyword,channel.name) %>% table()
-
-yt_master_ds %>%     mutate(the_day=as.Date(mdy(str_extract(
-  EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
-  mutate(month=month(lubridate::as_date(the_day))) %>% 
-  mutate(year = year(lubridate::as_date(the_day)))%>%
-  filter(channel.name %in% c("Sky News Australia", "GBNews")) %>% filter(keyword=="gender ideology") %>%
-  mutate(channel_name=case_when(
-    channel.name=="Sky News Australia" ~ 1,
-    channel.name=="GBNews" ~ 0
-  ))%>%
-  arrange(EntryPublished)  -> x 
-
-  glm(channel_name ~ year + as.factor(month), data = x, family="binomial") %>% summary()
-  
+tuber::yt_search(channel_id = "UCXIJgqnII2ZOINSWNOGFThA",
+                 term = "dylan mulvaney",max_pages = 500,
+                 get_all = TRUE,max_results = 500, 
+                 published_before = "2024-01-01T00:01:01Z")-> x
