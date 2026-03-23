@@ -549,3 +549,75 @@ tuber::yt_search(channel_id = "UCXIJgqnII2ZOINSWNOGFThA",
                  term = "dylan mulvaney",max_pages = 500,
                  get_all = TRUE,max_results = 500, 
                  published_before = "2024-01-01T00:01:01Z")-> x
+
+x-> fox_dylan
+
+fox_dylan %>%
+  mutate(month=month(as_date(publishedAt)))%>%
+  mutate(year=year(as_date(publishedAt)))%>%
+  filter(year=="2023") %>% select(month) |> ggplot()+
+  geom_point()
+         
+
+x %>%
+  select(publishedAt)
+
+
+yt_likes_23_to_25 %>% 
+  filter(year>2022)%>%
+  filter(year<2026)%>%
+  #filter(keyword %in% c("gender ideology","transgender","gender identity"))%>%
+  filter(keyword != "gender confusion")%>%
+  filter(channel_unique_ID %in% c(#"UCXIJgqnII2ZOINSWNOGFThA",
+                                                      "UCO0akufu9MOzyz3nvGIXAAw",
+                                                      "UC0vn8ISa4LKMunLbzaXLnOQ"))%>%
+  group_by(month,year)%>%
+  mutate(month_year=as_date(paste0("01-",month,"-",year),format="%d-%m-%Y"))%>%
+  ungroup()%>%
+  group_by(month,year,channel.name)%>%
+  mutate(view_mean=mean(video_views))%>%
+  mutate(like_mean=mean(likeCount))%>%
+  mutate(n=n())%>%
+  ungroup()%>%
+    ggplot()+
+    geom_point(aes(x=month_year,
+                   y=n,
+                   size=view_mean,
+                   alpha=like_mean, 
+                   colour = channel.name))+
+    #geom_smooth(aes(x=month_year,y=n,colour = channel.name), se=F, alpha = 0.1)+
+  xlab("")+ylab("\n\n\n")+
+  labs(title = "Sky News Australia and GB News",
+       subtitle = "Fox as comparison. 2023-2025, all regions\n\n",caption="darker points indicate mean likes\nsize indicates view count")+
+  theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
+        panel.background = element_rect("white"),legend.background = element_rect("white"),
+        legend.box.background = element_rect("white"),legend.key = element_rect("white"),
+        text = element_text(colour = "black"),
+        legend.position = "none")+
+  scale_color_paletteer_d("yarrr::eternal")+
+  facet_grid(.~keyword)
+
+
+yt_likes_23_to_25 %>% 
+  filter(year>2023)%>%
+  filter(year<2025)%>%
+  filter(keyword %in% c("gender ideology","transgender","gender identity"))%>%
+  filter(channel_unique_ID %in% c(#"UCXIJgqnII2ZOINSWNOGFThA",
+    "UCO0akufu9MOzyz3nvGIXAAw",
+    "UC0vn8ISa4LKMunLbzaXLnOQ"))%>%
+  group_by(channel.name,the_day)%>%
+  mutate(n=n())%>%
+  ungroup()%>%
+  ggplot()+
+  geom_point(aes(x=EntryPublished,y=n,colour = channel.name))+
+  #geom_smooth(aes(x=month_year,y=n,colour = channel.name))+
+  xlab("")+ylab("\n\n\n")+
+  labs(title = "Sky News Australia and GB News",
+       subtitle = "Fox as comparison. 2023-2025, all regions\n\n")+
+  theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
+        panel.background = element_rect("white"),legend.background = element_rect("white"),
+        legend.box.background = element_rect("white"),legend.key = element_rect("white"),
+        text = element_text(colour = "black"),
+        legend.position = "bottom")+
+  scale_color_paletteer_d("yarrr::eternal")+
+  facet_grid(keyword~year)
