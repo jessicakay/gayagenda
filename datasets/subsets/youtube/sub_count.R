@@ -25,17 +25,17 @@ i<-0 ; for (i in 1:length(channel_ID_list)){
             as_tibble()
           
           names(subscriber_scrape)[ 1]<-"channel_unique_ID"
-          names(subscriber_scrape)[ 2]<-"publishedAt"
-          names(subscriber_scrape)[ 3]<-"country"
-          names(subscriber_scrape)[ 4]<-"title"
-          names(subscriber_scrape)[ 5]<-"description"
-          names(subscriber_scrape)[ 6]<-"view_count"
-          names(subscriber_scrape)[ 7]<-"subscriber_count"
-          names(subscriber_scrape)[ 8]<-"hiddenSubscriberCount"
-          names(subscriber_scrape)[ 9]<-"viewCount"
-          names(subscriber_scrape)[10]<-"videoCount"
+          names(subscriber_scrape)[ 2]<-"customURL"
+          names(subscriber_scrape)[ 3]<-"publishedAt"
+          names(subscriber_scrape)[ 4]<-"country"
+          names(subscriber_scrape)[ 5]<-"title"
+          names(subscriber_scrape)[ 6]<-"description"
+          names(subscriber_scrape)[ 7]<-"view_count"
+          names(subscriber_scrape)[ 8]<-"subscriber_count"
+          names(subscriber_scrape)[ 9]<-"hiddenSubscriberCount"
+          names(subscriber_scrape)[10]<-"viewCount"
+          names(subscriber_scrape)[11]<-"videoCount"
           
-          
-          
+  names(subscriber_scrape)          
           
           
