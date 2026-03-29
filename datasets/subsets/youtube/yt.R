@@ -408,7 +408,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
   yt_likes_23_to_25 %>%
     group_by(year,keyword,month)%>%
     filter(!(video_ID %in% exc_list))%>%
-#    filter(keyword %in% main_kws)%>%
+    filter(keyword %in% main_kws)%>%
     mutate(like_m=mean(likeCount,na.rm=TRUE))%>%
     mutate(comm_m=mean(commentCount,na.rm=TRUE))%>%
     #    mutate(ymonth=as_date(paste0(month,"-",year)))%>%
@@ -420,7 +420,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
          subtitle = "2023-2025, all regions\n\n")+
     labs(size="mean comments",color="search term")+
     #geom_bar(aes(color=as.factor(keyword)))+
-    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
+#    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
     geom_point(aes(y=like_m,x=as.factor(month),size=comm_m,color=keyword,group=keyword))+
     #geom_boxplot(aes(y=commentCount))+
     theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
@@ -435,7 +435,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
   yt_likes_23_to_25 %>%
     group_by(year,keyword,month)%>%
     filter(!(video_ID %in% exc_list))%>%
-#    filter(keyword %in% main_kws)%>%
+    filter(keyword %in% main_kws)%>%
     #mutate(like_m=mean(likeCount,na.rm=TRUE))%>%
     #mutate(comm_m=mean(commentCount,na.rm=TRUE))%>%
     mutate(like_m=median(likeCount,na.rm=TRUE))%>%
@@ -449,7 +449,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
     labs(title = "Median likes on YouTube per video per search term",
          subtitle = "2023-2025, all regions\n\n")+
     #geom_bar(aes(color=as.factor(keyword)))+
-    geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
+ #   geom_line(aes(y=like_m,x=as.factor(month),color=keyword,group=keyword))+
     geom_point(aes(y=like_m,x=as.factor(month),size=comm_m,color=keyword,group=keyword))+
     #geom_boxplot(aes(y=commentCount))+
     theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
@@ -475,7 +475,7 @@ grid.arrange(plot_b, plot_c,ncol=1)
     mutate(max_like=max(likeCount,na.rm=TRUE))%>%
     mutate(max_comm=max(commentCount,na.rm=TRUE))%>%
     select(contains(c("_m","x_"))) %>%
-    distinct(month,year,keyword,.keep_all = T) %>% View()
+    distinct(month,year,keyword,.keep_all = T)
   
   yt_likes_23_to_25 %>%
     filter(!(video_ID %in% exc_list))%>%
@@ -545,79 +545,43 @@ first_place%>%
   tidyr::pivot_wider(names_from=year, values_from = n) 
 
 
-tuber::yt_search(channel_id = "UCXIJgqnII2ZOINSWNOGFThA",
-                 term = "dylan mulvaney",max_pages = 500,
-                 get_all = TRUE,max_results = 500, 
-                 published_before = "2024-01-01T00:01:01Z")-> x
+yt_master_ds %>%     mutate(the_day=as.Date(mdy(str_extract(
+  EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
+  mutate(month=month(lubridate::as_date(the_day))) %>% 
+  mutate(year = year(lubridate::as_date(the_day)))%>%
+  filter(channel.name %in% c("Sky News Australia", "GBNews")) %>% arrange(EntryPublished) %>% select(year,keyword,channel.name) %>% table()
 
-x-> fox_dylan
+yt_master_ds %>%     mutate(the_day=as.Date(mdy(str_extract(
+  EntryPublished,pattern = "[a-zA-Z]+\\s[0-9]+\\,\\s20[0-9]+")))) %>%
+  mutate(month=month(lubridate::as_date(the_day))) %>% 
+  mutate(year = year(lubridate::as_date(the_day)))%>%
+  filter(channel.name %in% c("Sky News Australia", "GBNews")) %>% filter(keyword=="gender ideology") %>%
+  mutate(channel_name=case_when(
+    channel.name=="Sky News Australia" ~ 1,
+    channel.name=="GBNews" ~ 0
+  ))%>%
+  arrange(EntryPublished)  -> x 
 
-fox_dylan %>%
-  mutate(month=month(as_date(publishedAt)))%>%
-  mutate(year=year(as_date(publishedAt)))%>%
-  filter(year=="2023") %>% select(month) |> ggplot()+
-  geom_point()
-         
-
-x %>%
-  select(publishedAt)
-
-
-yt_likes_23_to_25 %>% 
-  filter(year>2022)%>%
-  filter(year<2026)%>%
-  #filter(keyword %in% c("gender ideology","transgender","gender identity"))%>%
-  filter(keyword != "gender confusion")%>%
-  filter(channel_unique_ID %in% c(#"UCXIJgqnII2ZOINSWNOGFThA",
-                                                      "UCO0akufu9MOzyz3nvGIXAAw",
-                                                      "UC0vn8ISa4LKMunLbzaXLnOQ"))%>%
-  group_by(month,year)%>%
-  mutate(month_year=as_date(paste0("01-",month,"-",year),format="%d-%m-%Y"))%>%
-  ungroup()%>%
-  group_by(month,year,channel.name)%>%
-  mutate(view_mean=mean(video_views))%>%
-  mutate(like_mean=mean(likeCount))%>%
-  mutate(n=n())%>%
-  ungroup()%>%
-    ggplot()+
-    geom_point(aes(x=month_year,
-                   y=n,
-                   size=view_mean,
-                   alpha=like_mean, 
-                   colour = channel.name))+
-    #geom_smooth(aes(x=month_year,y=n,colour = channel.name), se=F, alpha = 0.1)+
-  xlab("")+ylab("\n\n\n")+
-  labs(title = "Sky News Australia and GB News",
-       subtitle = "Fox as comparison. 2023-2025, all regions\n\n",caption="darker points indicate mean likes\nsize indicates view count")+
-  theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
-        panel.background = element_rect("white"),legend.background = element_rect("white"),
-        legend.box.background = element_rect("white"),legend.key = element_rect("white"),
-        text = element_text(colour = "black"),
-        legend.position = "none")+
-  scale_color_paletteer_d("yarrr::eternal")+
-  facet_grid(.~keyword)
-
-
-yt_likes_23_to_25 %>% 
-  filter(year>2023)%>%
-  filter(year<2025)%>%
-  filter(keyword %in% c("gender ideology","transgender","gender identity"))%>%
-  filter(channel_unique_ID %in% c(#"UCXIJgqnII2ZOINSWNOGFThA",
-    "UCO0akufu9MOzyz3nvGIXAAw",
-    "UC0vn8ISa4LKMunLbzaXLnOQ"))%>%
-  group_by(channel.name,the_day)%>%
-  mutate(n=n())%>%
-  ungroup()%>%
-  ggplot()+
-  geom_point(aes(x=EntryPublished,y=n,colour = channel.name))+
-  #geom_smooth(aes(x=month_year,y=n,colour = channel.name))+
-  xlab("")+ylab("\n\n\n")+
-  labs(title = "Sky News Australia and GB News",
-       subtitle = "Fox as comparison. 2023-2025, all regions\n\n")+
-  theme(plot.background=element_rect("white", colour = "white"),panel.grid = element_line("white"),  
-        panel.background = element_rect("white"),legend.background = element_rect("white"),
-        legend.box.background = element_rect("white"),legend.key = element_rect("white"),
-        text = element_text(colour = "black"),
-        legend.position = "bottom")+
-  scale_color_paletteer_d("yarrr::eternal")+
-  facet_grid(keyword~year)
+  glm(channel_name ~ year + as.factor(month), data = x, family="binomial") %>% summary()
+  
+  
+  
+  as.vector(fox_vids$contentDetails.videoId)->vids 
+  rename(fox_vids, video_ID=contentDetails.videoId) -> fox_vids
+  vid_list <- NULL
+  youtube_scrape <- data.frame(video_ID=character(0))
+  
+  i<-0 ; for (i in 1:5000){
+    get_video_details(video_id = vids[as.numeric(i)])$items ->> x
+    plyr::rbind.fill(youtube_scrape,as.data.frame(x))->> youtube_scrape
+    sample(5)[1]->sleepy ; Sys.sleep(sleepy) 
+    print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
+  } 
+  
+  for (i in 12002:14001){
+    get_video_details(video_id = vids[as.numeric(i)])$items ->> x
+    plyr::rbind.fill(youtube_scrape,as.data.frame(x)[1:24])->> youtube_scrape
+    sample(1)[1]->sleepy ; Sys.sleep(sleepy) 
+    print(paste0(x[[1]]$snippet$channelTitle,"   ...   # ",as.numeric(i)," ~ waiting ",toString(sleepy)," seconds..."))
+  } 
+  
