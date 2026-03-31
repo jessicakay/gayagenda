@@ -524,14 +524,30 @@ pressr %>%
       # MSN ----------------------------------------------------#
       # 
       
+      
       mega_ds %>% mutate(k=str_extract(EntryURL,"(?<=ocid\\=)[a-z0-9A-Z-]+")) %>% 
         filter(!is.na(k)) %>% select(k) %>% table() %>% View()
+
+      # mutate(articleID=str_extract(EntryURL,'[0-9]+(?<=[0-9]{15})')) %>%
       
       mega_ds %>% filter(pullURL=="msn.com") %>%
         mutate(url_stub=str_remove(EntryURL,'https?:\\/\\/www.msn.com/')) %>%
-        mutate(country=str_extract(url_stub, '[a-z]+')) %>%
-        mutate(publication=gsub(pattern = "-", replacement = " ", 
-                                str_extract(url_stub,'[a-zA-Z0-9-]+(?=/[0-9]{8})'))) %>%
-        mutate(pubdate=str_extract(EntryURL,'(?=[0-9]{8})[0-9]+')) %>%
-        mutate(articleID=str_extract(EntryURL,'[0-9]+(?<=[0-9]{15})')) %>% select(country,url_stub)
+        mutate(country=str_extract(url_stub, '[a-z-]+')) %>%
+        mutate(topic=str_extract(url_stub, '(?<=[a-z-]{5}\\/)[a-zA-Z0-9-]+')) %>%
+        mutate(post_ID=str_extract(url_stub, '(?<=[a-z-]{5}\\/)[a-zA-Z0-9-]+\\/[a-zA-Z0-9-]+\\/[a-zA-Z0-9-]+\\/')) %>%
+        select(country, topic, post_ID) -> x
+      
+      mega_ds %>% filter(pullURL=="msn.com") -> msn_set
+      
+      # str_split_fixed(msn_set$tracking,"\\?",2)[,1]
+      
+      msn_set %>%
+        mutate(country=as.data.frame(str_split_fixed(str_remove(EntryURL,"https?://"),"/",6))[[2]]) %>%
+        mutate(category=as.data.frame(str_split_fixed(str_remove(EntryURL,"https?://"),"/",6))[[3]]) %>%
+        mutate(region=as.data.frame(str_split_fixed(str_remove(EntryURL,"https?://"),"/",6))[[4]]) %>%
+        mutate(post_slug=as.data.frame(str_split_fixed(str_remove(EntryURL,"https?://"),"/",6))[[5]]) %>%
+        mutate(tracking=as.data.frame(str_split_fixed(str_remove(EntryURL,"https?://"),"/",6))[[6]]) %>%
+        mutate(tracking_data=str_extract(tracking,"(?<=\\?)[a-z0-9A-Z-=]+"))%>%
+        mutate(article_ID=str_extract(tracking,"[a-z0-9A-Z-]+"))%>%
+        select(country,category,region,post_slug,article_ID,tracking_data) -> msn_set
       
