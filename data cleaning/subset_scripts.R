@@ -520,3 +520,18 @@ pressr %>%
         
       grid.arrange(img_1, img_2,ncol=2)
       
+      
+      # MSN ----------------------------------------------------#
+      # 
+      
+      mega_ds %>% mutate(k=str_extract(EntryURL,"(?<=ocid\\=)[a-z0-9A-Z-]+")) %>% 
+        filter(!is.na(k)) %>% select(k) %>% table() %>% View()
+      
+      mega_ds %>% filter(pullURL=="msn.com") %>%
+        mutate(url_stub=str_remove(EntryURL,'https?:\\/\\/www.msn.com/')) %>%
+        mutate(country=str_extract(url_stub, '[a-z]+')) %>%
+        mutate(publication=gsub(pattern = "-", replacement = " ", 
+                                str_extract(url_stub,'[a-zA-Z0-9-]+(?=/[0-9]{8})'))) %>%
+        mutate(pubdate=str_extract(EntryURL,'(?=[0-9]{8})[0-9]+')) %>%
+        mutate(articleID=str_extract(EntryURL,'[0-9]+(?<=[0-9]{15})')) %>% select(country,url_stub)
+      
