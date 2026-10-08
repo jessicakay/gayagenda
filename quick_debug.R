@@ -20,3 +20,19 @@ for(i in 1:dim(data_sheets)[1]){
     fix_list<-c(fix_list,i)
   }
 }
+
+for(i in fix_list){
+}
+
+googlesheets4::read_sheet(data_sheets$id[1])[1,]
+
+googlesheets4::sheet_insert_rows(ss=data_sheets$id[1],
+sheet=Sheet1,
+row=1,
+number=1)
+
+googlesheets4::sheet
+(ss=data_sheets$id[1],
+                                 sheet=Sheet1,
+                                 row=1,
+                                 number=1)
